@@ -4,10 +4,14 @@ from django.contrib.auth.models import User
 import random
 import string
 
+def generate_api_key():
+    return ''.join(random.choices(string.digits + string.ascii_letters + '-', k=15))
+
+
 class Profile(models.Model):
     ID = models.AutoField(auto_created=True, primary_key=True, serialize=True, verbose_name='ID')
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    api_key = models.CharField(max_length=255, default=''.join(random.choices(string.digits + string.ascii_letters + '-', k=15)), null=False)
+    api_key = models.CharField(max_length=255, default=generate_api_key, null=False)
 
     def __str__(self):
         return self.user.username
