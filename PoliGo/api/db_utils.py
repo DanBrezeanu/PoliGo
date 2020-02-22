@@ -1,4 +1,5 @@
 from api.serializers import ProductSerializer
+from api.http_codes import Error422
 from store.models import Product
 import json
 
@@ -19,7 +20,7 @@ def check_stock(request):
 
     # No other parameters except API-KEY were provided -> return all products
     if len(get_options) == 1:
-        return json.dumps([ProductSerializer(query).data for query in Product.objects.all()])
+        return json.dumps({'products': [ProductSerializer(query).data for query in Product.objects.all()]})
     
     queried_products = set()
     try:
@@ -39,7 +40,13 @@ def check_stock(request):
         if 'stock' in get_options:
             queried_products.update([Product.objects.get(stock = stock) for stock in get_options['stock']])
     except store.models.Product.DoesNotExist:
-        return json.dumps('Error 422')
+        return Error422('Wrong data')
 
 
-    return json.dumps([ProductSerializer(query).data for query in queried_products])
+    return json.dumps({'products': [ProductSerializer(query).data for query in queried_products]})
+
+
+def add_stock(request):
+    post_options = dict(request.POST)
+
+

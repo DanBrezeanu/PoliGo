@@ -4,15 +4,13 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 
 from api.serializers import UserSerializer, ProductSerializer
+from api.http_codes import Error403, Error422, Error503, OK200
 
 from store.models import Product, Profile
 from api import db_utils
 import json
 import store
-
-def Home(request):
-   # print(UserSerializer(request.user).data)
-    return HttpResponse('ok')
+import functools
 
 def key_to_user(request):
     """
@@ -37,7 +35,34 @@ def key_to_user(request):
     except store.models.Profile.DoesNotExist:
         return None
 
-        
+def is_staff(func):
+    """
+    Function decorator that only allows the function execution only if user.is_staff is True
+    and the API key provided exists and is valid
+
+    :returns: The functions return value or Error 403 JSON if access is not granted
+    :rtype: HttpResponse
+    """
+
+    @functools.wraps(func)
+    def wrapper_decorator(*args, **kwargs):
+        # Get profile
+        profile = key_to_user(args[0])
+
+        # Acces Denied
+        if profile is None or not profile.user.is_staff:
+            return HttpResponse(Error403('Unauthorized'))
+
+        return func(*args, **kwargs)
+
+    return wrapper_decorator
+
+
+def Home(request):
+   # print(UserSerializer(request.user).data)
+    return HttpResponse('ok')
+
+@is_staff      
 def check_stock(request):
     """
     Provides and ENDPOINT for querying the products.
@@ -49,22 +74,23 @@ def check_stock(request):
     :rtype: HttpResponse
     """
 
-    # Get profile
-    profile = key_to_user(request)
-    
-    # Acces Denied
-    if profile is None or not profile.user.is_staff:
-        return HttpResponse(json.dumps({'error': 403}))
-
     # Get the queried products
     if request.method == 'GET':
         products_json = db_utils.check_stock(request)
     else:
-        return HttpResponse(json.dumps({'error': 503}))
+        return HttpResponse(Error503('Only GET requests accepted'))
 
-    return HttpResponse(products_json)
+    return HttpResponse(OK200(products_json))
 
+@is_staff
 def add_stock(request):
     if request.method == 'POST':
-        pass
+        result = db_utils.add_stock(request)
+
+        if result is None:
+            return HttpResponse(Error422('Wrong data'))
+        else:
+            return HttpResponse(OK200(result))
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
 
