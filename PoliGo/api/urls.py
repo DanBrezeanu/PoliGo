@@ -4,5 +4,6 @@ from api import views
 
 urlpatterns = [
     path('', views.Home),
-    path('stocks/', views.check_stock)
+    path('checkstocks/', views.check_stock),
+    path('addstocks/', views.add_stock),
 ]

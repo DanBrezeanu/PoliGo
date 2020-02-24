@@ -1,4 +1,4 @@
-from api.serializers import ProductSerializer
+from api.serializers import ProductSerializer, ProductDeserializer
 from api.http_codes import Error422
 from store.models import Product
 import json
@@ -26,19 +26,19 @@ def check_stock(request):
     try:
         # Find products with the requested SKUs
         if 'SKU' in get_options:
-            queried_products.update([Product.objects.get(SKU = sku) for sku in get_options['SKU']])
+            queried_products.update([item for SKU in get_options['SKU'] for item in Product.objects.filter(SKU = SKU)])
 
         # Find products with the requested names
         if 'name' in get_options:
-            queried_products.update([Product.objects.get(name = name) for name in get_options['name']])
+            queried_products.update([item for name in get_options['name'] for item in Product.objects.filter(name = name)])
         
         # Find products with the requested categories
         if 'category' in get_options:
-            queried_products.update([Product.objects.get(category = category) for category in get_options['category']])
+            queried_products.update([item for category in get_options['category'] for item in Product.objects.filter(category = category)])
         
         # Find products with the requested stocks
         if 'stock' in get_options:
-            queried_products.update([Product.objects.get(stock = stock) for stock in get_options['stock']])
+            queried_products.update([item for stock in get_options['stock'] for item in Product.objects.filter(stock = stock)])
     except store.models.Product.DoesNotExist:
         return Error422('Wrong data')
 
@@ -48,5 +48,24 @@ def check_stock(request):
 
 def add_stock(request):
     post_options = dict(request.POST)
+    products = []
+
+    # TODO: create separate message errors for each product/field
+    #       return message or smth (not None/True)
+    
+    try:
+        n = int(post_options['n'][0])
+
+
+        for idx in range(n):
+            item_name = 'product{}'.format(idx)
+            products.append(json.loads(post_options[item_name][0]))
+
+        for prod in products:
+            ProductDeserializer.deserialize(**prod).save()
+    except:
+        return None
+
+    return True
 
 

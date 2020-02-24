@@ -25,7 +25,7 @@ def key_to_user(request):
     
     # Get API-KEY from request
     try:    
-        api_key = request.GET['api_key']
+        api_key = request.GET['api_key'] if request.method == "GET" else request.POST['api_key'] 
     except: # No API-KEY provided
         return None
 
@@ -90,7 +90,7 @@ def add_stock(request):
         if result is None:
             return HttpResponse(Error422('Wrong data'))
         else:
-            return HttpResponse(OK200(result))
+            return HttpResponse(OK200(None))
     else:
         return HttpResponse(Error503('Only POST requests accepted'))
 
