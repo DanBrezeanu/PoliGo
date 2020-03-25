@@ -34,6 +34,9 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
+    public void exitApp(View v) {
+        finish();
+    }
 
     public void testRequest(View v) {
 //        final EditText textView = (EditText) findViewById(R.id.editText);
