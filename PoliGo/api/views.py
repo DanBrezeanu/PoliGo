@@ -74,6 +74,8 @@ def check_stock(request):
     :rtype: HttpResponse
     """
 
+    # dir(request)
+
     # Get the queried products
     if request.method == 'GET':
         products_json = db_utils.check_stock(request)
@@ -94,3 +96,37 @@ def add_stock(request):
     else:
         return HttpResponse(Error503('Only POST requests accepted'))
 
+
+# @is_staff
+def remove_stock(request):
+    if request.method == 'POST':
+        result = db_utils.remove_stock(request)
+
+        if result is None:
+            return HttpResponse(Error422('Wrong data'))
+        else:
+            return HttpResponse(OK200(None))
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
+
+
+# def pretul_produsului(request):
+#     user = key_to_user(request)
+
+#     if user is None:
+#         nu exista utilizator cu cheia asta
+
+#     user -> profile 
+#     shopping_cart-ul -> profile-ului
+#     cautati produsul cu SKU furnizat
+#     adaugati produsul -> shopping cart 
+
+# TODO:
+
+# ENDPOINT-URI PENTRU UTILIZATORI (fara @is_staff)
+# am scanat produsul -> POST REQ 
+# am eliminat din cos -> POST REQ
+# pretul produsului -> GET
+# historicul cumparaturilor -> GET
+# am terminat cumparaturile -> POST REQ
+# orice altceva
