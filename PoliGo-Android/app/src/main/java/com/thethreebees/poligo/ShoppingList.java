@@ -21,6 +21,10 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+
+import java.util.HashMap;
+
 public class ShoppingList extends Activity {
     private ListView productList;
     ProductAdapter productAdapter;
@@ -28,12 +32,16 @@ public class ShoppingList extends Activity {
     private Button addButton;
     final int image = R.drawable.lab5_car_icon;
     final int LAUNCH_BARCODE_SCANNING = 1;
+    private ConnectionManager conn;
     String result;
+    HashMap<String, String> params = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
+
+        conn = ConnectionManager.getInstance(this, "192.168.0.248", 8000);
 
         productList = findViewById(R.id.list_item);
         View footerView =  ((LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE))
@@ -58,18 +66,24 @@ public class ShoppingList extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == LAUNCH_BARCODE_SCANNING) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 result = data.getStringExtra("result");
 
-                String name = result;
+                params.put("SKU", result);
 
-                productAdapter.addProduct(name, image);
+
+                conn.makeRequest(
+                        Request.Method.GET,
+                        params,
+                        "checkstocks/");
+
             }
+        }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
             }
-        }
     }
+
 
     @Override
     public void onBackPressed() {

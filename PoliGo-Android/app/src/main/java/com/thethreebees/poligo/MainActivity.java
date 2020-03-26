@@ -37,44 +37,4 @@ public class MainActivity extends Activity {
     public void exitApp(View v) {
         finish();
     }
-
-    public void testRequest(View v) {
-//        final EditText textView = (EditText) findViewById(R.id.editText);
-
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        Uri uri = new Uri.Builder()
-                .scheme("http")
-                .encodedAuthority("192.168.0.248:8000")
-                .path("api/v1/checkstocks")
-                .build();
-
-        Log.d("INFO::", uri.toString());
-        String url = uri.toString();
-
-        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>()
-                {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        // display response
-                        try {
-                            Log.d("response.code", response.get("code").toString());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Log.d("Response", response.toString());
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Error.Response", error.toString());
-                    }
-                }
-        );
-
-        queue.add(getRequest);
-    }
 }
