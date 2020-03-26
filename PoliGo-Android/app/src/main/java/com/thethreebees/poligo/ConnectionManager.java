@@ -1,6 +1,8 @@
 package com.thethreebees.poligo;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.EditText;
@@ -13,22 +15,17 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static java.lang.Thread.sleep;
 
 public class ConnectionManager {
     private String uriBase;
     private Context context;
     private static ConnectionManager instance = null;
-    JSONObject responseJson = null;
     final int image = R.drawable.lab5_car_icon;
 
     private ConnectionManager(Context context, String ip, Integer port) {
@@ -75,7 +72,34 @@ public class ConnectionManager {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        ((ShoppingList) context).productAdapter.addProduct(response.toString(), image);
+                        try {
+                            Log.d("Server response", response.toString());
+                            if (response.getInt("code") == 200 && response.getJSONArray("products").length() > 0) {
+                                JSONArray products = response.getJSONArray("products");
+                                for (int i = 0; i < products.length(); ++i) {
+                                    JSONObject prod = (JSONObject) products.get(i);
+                                    ((ShoppingList) context).productAdapter.addProduct(
+                                            prod.getString("SKU"),
+                                            prod.getString("name"),
+                                            prod.getDouble("price"),
+                                            image
+                                    );
+                                }
+                            } else {
+                                AlertDialog alertDialog = new AlertDialog.Builder(context)
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setMessage("This product does not exist")
+                                        .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                dialogInterface.dismiss();
+                                            }
+                                        })
+                                        .show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 },
                 new Response.ErrorListener() {

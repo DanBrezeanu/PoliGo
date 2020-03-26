@@ -1,25 +1,18 @@
 package com.thethreebees.poligo;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.util.Log;
 
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout.LayoutParams;
+
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
+
 
 import com.android.volley.Request;
 
@@ -44,16 +37,12 @@ public class ShoppingList extends Activity {
         conn = ConnectionManager.getInstance(this, "192.168.0.248", 8000);
 
         productList = findViewById(R.id.list_item);
-        View footerView =  ((LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                .inflate(R.layout.footer_layout, null, false);
-
-        productList.addFooterView(footerView);
 
         productAdapter = new ProductAdapter(this);
 
         productList.setAdapter(productAdapter);
 
-        addButton = (Button) footerView.findViewById(R.id.button_add_product);
+        addButton = (Button) findViewById(R.id.button_add_product);
     }
 
     public void scanCode(View v) {
@@ -70,7 +59,7 @@ public class ShoppingList extends Activity {
                 result = data.getStringExtra("result");
 
                 params.put("SKU", result);
-
+                params.put("api_key", "w/e"); // NOT IMPLEMENTED YET
 
                 conn.makeRequest(
                         Request.Method.GET,
