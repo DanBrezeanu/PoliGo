@@ -48,7 +48,6 @@ public class ProductAdapter extends BaseAdapter {
         {
             LayoutInflater layoutInflater = context.getLayoutInflater();
             element = layoutInflater.inflate(R.layout.product_list, null);
-            element.findViewById(R.id.button_add_product);
         }
         else element = view;
 

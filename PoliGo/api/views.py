@@ -62,7 +62,7 @@ def Home(request):
    # print(UserSerializer(request.user).data)
     return HttpResponse('ok')
 
-@is_staff      
+# @is_staff      
 def check_stock(request):
     """
     Provides and ENDPOINT for querying the products.
@@ -108,6 +108,11 @@ def remove_stock(request):
             return HttpResponse(OK200(None))
     else:
         return HttpResponse(Error503('Only POST requests accepted'))
+
+def login(request):
+    fake_api_key = '0xCAFEBABE0xDEADBEEF'
+
+    return HttpResponse(json.dumps({'api_key': fake_api_key}))
 
 
 # def pretul_produsului(request):
