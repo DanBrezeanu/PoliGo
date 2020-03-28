@@ -6,7 +6,7 @@
  cd PoliGo
  
  # instaleaza pachetul pentru virtual environment
- pip3 install venv
+ pip3 install python3-venv
 
  # creeaza un virtual environment 
  python3 -m venv env
@@ -24,7 +24,7 @@
  python3 manage.py migrate
 
  # ruleaza serverul pe localhost port 8000
- python3 runserver 0.0.0.0:8000
+ python3 manage.py runserver 0.0.0.0:8000
  ```
 
 <span style="font-size:12px"> 
