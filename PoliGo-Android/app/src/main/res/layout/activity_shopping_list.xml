@@ -5,43 +5,99 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ShoppingList">
+    tools:context=".ShoppingList"
+    android:background="@color/theWhite">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
-    <ListView
-        android:id="@+id/list_item"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:transcriptMode="alwaysScroll"/>
+        android:orientation="vertical">
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/list_item"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.8"
+            android:transcriptMode="alwaysScroll"/>
+
+
+        <Button
+            android:id="@+id/btn_add_prod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="-3dp"
+            android:layout_weight="0"
+            android:background="@drawable/full_screen_button"
+            android:onClick="onScanCode"
+            android:text="Adauga" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_weight="0.07"
+            android:background="@drawable/blue_backround"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_add_prod"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/full_screen_button"
-                android:onClick="scanCode"
-                android:layout_weight="1"
-                android:text="Adauga" />
+            <TextView
+                android:id="@+id/total_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="15dp"
+                android:gravity="center_vertical"
+                android:text="Total: "
+                android:textAlignment="center"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/total_sum"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
+                android:text="0.0"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/total_text"
+                tools:layout_editor_absoluteY="0dp" />
+
+            <TextView
+                android:id="@+id/currency_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="  RON"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/total_sum"
+                tools:layout_editor_absoluteY="16dp" />
+
+            <Button
+                android:id="@+id/finished_shopping"
+                android:layout_width="53dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/tick_button"
+                android:text="\u2714"
+                android:textSize="20dp"
+                android:visibility="gone"
+                android:onClick="onFinishedShopping"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
+        android:indeterminateDrawable="@drawable/progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

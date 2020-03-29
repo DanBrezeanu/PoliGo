@@ -16,22 +16,19 @@ import android.widget.EditText;
 
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
-import com.android.volley.toolbox.StringRequest;
 
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
+
 
 public class ShoppingList extends Activity {
     private ListView productList;
@@ -40,11 +37,11 @@ public class ShoppingList extends Activity {
     private Button addButton;
     final int image = R.drawable.lab5_car_icon;
     final int LAUNCH_BARCODE_SCANNING = 1;
-    private ConnectionManager conn;
     String result;
     HashMap<String, String> params = new HashMap<>();
     ProgressBar progressBar;
     Context context;
+    public ShoppingCart cart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,19 +50,18 @@ public class ShoppingList extends Activity {
 
         context = this;
 
-//        conn = ConnectionManager.getInstance(this, "192.168.0.248", 8000);
-
         productList = findViewById(R.id.list_item);
         addButton = findViewById(R.id.btn_add_prod);
         progressBar = findViewById(R.id.progressBar);
 
         productAdapter = new ProductAdapter(this);
+        cart = new ShoppingCart();
 
         productList.setAdapter(productAdapter);
 
     }
 
-    public void scanCode(View v) {
+    public void onScanCode(View v) {
         Intent scanCodeIntent = new Intent(this, BarcodeScanner.class);
         startActivityForResult(scanCodeIntent, LAUNCH_BARCODE_SCANNING);
     }
@@ -99,18 +95,28 @@ public class ShoppingList extends Activity {
 
                                 try {
                                     if (response.getInt("code") == 200 && response.getJSONArray("products").length() > 0) {
-                                        JSONArray products = response.getJSONArray("products");
-                                        for (int i = 0; i < products.length(); ++i) {
-                                            JSONObject prod = (JSONObject) products.get(i);
-                                            ((ShoppingList) context).productAdapter.addProduct(
-                                                    prod.getString("SKU"),
-                                                    prod.getString("name"),
-                                                    prod.getDouble("price"),
-                                                    image
-                                            );
-                                        }
+                                        JSONObject prod = (JSONObject) response.getJSONArray("products").get(0);
+
+                                        ((ShoppingList) context).productAdapter.addProduct(
+                                                prod.getString("SKU"),
+                                                prod.getString("name"),
+                                                prod.getDouble("price"),
+                                                image
+                                        );
+
+                                        cart.addProduct(new Product(
+                                            prod.getString("SKU"),
+                                            prod.getString("name"),
+                                            prod.getDouble("price"),
+                                            image
+                                        ));
+
+                                        ((TextView) ((ShoppingList) context).findViewById(R.id.total_sum)).setText(cart.getTotalSum().toString());
+
+                                        ((ShoppingList) context).findViewById(R.id.finished_shopping).setVisibility(View.VISIBLE);
+
                                     } else {
-                                        AlertDialog alertDialog = new AlertDialog.Builder((ShoppingList)getApplicationContext())
+                                        AlertDialog alertDialog = new AlertDialog.Builder((ShoppingList)context )
                                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                                 .setMessage("This product does not exist")
                                                 .setNeutralButton("OK", new DialogInterface.OnClickListener() {
@@ -142,6 +148,11 @@ public class ShoppingList extends Activity {
             }
     }
 
+
+    public void onFinishedShopping(View v) {
+        Intent scanCodeIntent = new Intent(this, MainActivity.class);
+        startActivityForResult(scanCodeIntent, LAUNCH_BARCODE_SCANNING);
+    }
 
     @Override
     public void onBackPressed() {

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="#FFFFFF">
 
 
     <TextView
@@ -16,7 +17,7 @@
         android:gravity="center"
         android:text="PoliGo"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="#F89934"
+        android:textColor="@color/theOrange"
         android:textSize="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

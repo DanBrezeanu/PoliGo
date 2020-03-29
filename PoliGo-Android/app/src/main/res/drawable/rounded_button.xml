@@ -12,7 +12,7 @@
     <solid android:color="#FBFBFB" />
 
     <gradient android:startColor="#FBFBFB"
-        android:endColor="#FFFFFF"
+        android:endColor="@color/theWhite"
         android:angle="270" />
 
     <padding
@@ -27,6 +27,6 @@
 
     <stroke
         android:width="3dp"
-        android:color="#F89934" />
+        android:color="@color/theOrange" />
 
 </shape>
