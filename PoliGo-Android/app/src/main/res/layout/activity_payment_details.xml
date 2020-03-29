@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PaymentDetailsActivity">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+                <EditText
+                    android:id="@+id/card_number"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:backgroundTint="@color/theOrange"
+                    android:layout_weight="0.8"
+                    android:ems="19"
+                    android:maxLength="19"
+                    android:inputType="number"
+                    android:layout_marginTop="80dp"
+                    android:hint="Card Number"/>
+
+            <ImageView
+                android:id="@+id/card_company"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="16dp"
+                android:visibility="invisible"
+                android:layout_gravity="bottom"
+
+                android:src="@drawable/visa" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/card_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/theOrange"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:ems="50"
+            android:maxLength="50"
+            android:inputType="text"
+            android:layout_marginTop="20dp"
+            android:hint="Card Holder's Name"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"
+                android:layout_marginStart="20dp"
+                android:textAlignment="center"
+                android:layout_marginTop="80dp"
+                android:text="Expiration Date"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"
+                android:textAlignment="center"
+                android:layout_marginTop="80dp"
+                android:layout_marginStart="120dp"
+                android:text="CVV/CVC Number"/>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <EditText
+                android:id="@+id/exp_date_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                app:backgroundTint="@color/theOrange"
+                android:ems="2"
+                android:maxLength="2"
+                android:textAlignment="center"
+                android:inputType="number"
+                android:layout_marginTop="8dp"
+                android:hint="01"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:layout_marginTop="8dp"
+                android:textAlignment="center"
+                android:text="/"/>
+
+            <EditText
+                android:id="@+id/exp_date_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/theOrange"
+                android:ems="2"
+                android:maxLength="2"
+                android:inputType="number"
+                android:layout_marginEnd="16dp"
+                android:textAlignment="center"
+                android:layout_marginTop="8dp"
+                android:hint="21"/>
+
+            <EditText
+                android:id="@+id/cvv"
+                android:textAlignment="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="150dp"
+                android:layout_marginEnd="16dp"
+                android:ems="3"
+                android:maxLength="3"
+                android:inputType="number"
+                android:layout_marginTop="8dp"
+                app:backgroundTint="@color/theOrange"
+                android:hint="350"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/buttonRegister"
+            android:background="@drawable/rounded_button"
+            android:layout_marginTop="200dp"
+            android:layout_marginBottom="8dp"
+            android:layout_width="210dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:text="Register" />
+
+
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:visibility="gone"
+        android:indeterminateDrawable="@drawable/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.456" />
+</androidx.constraintlayout.widget.ConstraintLayout>

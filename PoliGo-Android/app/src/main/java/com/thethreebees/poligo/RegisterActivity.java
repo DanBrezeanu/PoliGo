@@ -43,15 +43,19 @@ public class RegisterActivity extends Activity {
         editTextUsername = findViewById(R.id.editTextUsername);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
-        radioGroupGender = findViewById(R.id.radioGender);
 
 
         findViewById(R.id.buttonRegister).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //if user pressed on button register
-                //here we will register the user to server
-                registerUser();
+//                if user pressed on button register
+//                here we will register the user to server
+
+                Intent intent = new Intent(RegisterActivity.this, PaymentDetailsActivity.class);
+                startActivity(intent);
+
+                //TODO: in payment register V
+//                registerUser();
             }
         });
 
@@ -71,7 +75,6 @@ public class RegisterActivity extends Activity {
         final String email = editTextEmail.getText().toString().trim();
         final String password = editTextPassword.getText().toString().trim();
 
-        final String gender = ((RadioButton) findViewById(radioGroupGender.getCheckedRadioButtonId())).getText().toString();
 
         //first we will do the validations
         if (TextUtils.isEmpty(username)) {
@@ -148,7 +151,6 @@ public class RegisterActivity extends Activity {
                 params.put("username", username);
                 params.put("email", email);
                 params.put("password", password);
-                params.put("gender", gender);
                 return params;
             }
         };
