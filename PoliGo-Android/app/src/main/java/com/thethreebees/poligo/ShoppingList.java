@@ -150,7 +150,7 @@ public class ShoppingList extends Activity {
 
 
     public void onFinishedShopping(View v) {
-        Intent scanCodeIntent = new Intent(this, MainActivity.class);
+        Intent scanCodeIntent = new Intent(this, CheckoutActivity.class);
         startActivityForResult(scanCodeIntent, LAUNCH_BARCODE_SCANNING);
     }
 

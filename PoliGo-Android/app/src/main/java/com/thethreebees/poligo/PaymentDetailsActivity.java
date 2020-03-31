@@ -4,42 +4,76 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
+import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PaymentDetailsActivity extends Activity {
 
     Context context;
+    private String username, password, email;
+    ProgressBar progressBar;
+
+    EditText cardDateMonth;
+    EditText cardDateYear;
+    EditText cardCVV;
+    EditText cardNumber;
+    EditText cardHolder;
+    ImageView cardCompany;
+    Button buttonRegiser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment_details);
 
+        cardDateMonth = findViewById(R.id.exp_date_month);
+        cardDateYear = findViewById(R.id.exp_date_year);
+        cardCVV = findViewById(R.id.cvv);
+        cardNumber = findViewById(R.id.card_number);
+        cardHolder = findViewById(R.id.card_holder);
+        cardCompany = findViewById(R.id.card_company);
+
         context = this;
+        Intent parentIntent = getIntent();
+
+        username = parentIntent.getStringExtra("username");
+        password = parentIntent.getStringExtra("password");
+        email = parentIntent.getStringExtra("email");
+
+        progressBar = findViewById(R.id.progressBar);
 
         mangeInputContext();
     }
 
-
-
     private void mangeInputContext() {
-        final EditText cardDateMonth = findViewById(R.id.exp_date_month);
-        final EditText cardDateYear = findViewById(R.id.exp_date_year);
-        final EditText cardCVV = findViewById(R.id.cvv);
-        final EditText cardNumber = findViewById(R.id.card_number);
-        final EditText cardHolder = findViewById(R.id.card_holder);
-        final ImageView cardCompany = findViewById(R.id.card_company);
         final int visaLogo = R.drawable.visa;
         final int masterCardLogo = R.drawable.mastercard;
 
@@ -170,4 +204,94 @@ public class PaymentDetailsActivity extends Activity {
     }
 
 
+    public void onRegisterUser(View v) {
+        //TODO: check card details are valid
+
+        JSONObject cardDetails = new JSONObject();
+        JSONObject params = new JSONObject();
+
+        try {
+            cardDetails.put("card_number", cardNumber.getText().toString());
+            cardDetails.put("card_holder", cardHolder.getText().toString());
+            cardDetails.put("card_month", cardDateMonth.getText().toString());
+            cardDetails.put("card_year", cardDateYear.getText().toString());
+            cardDetails.put("card_cvv", cardCVV.getText().toString());
+            cardDetails.put("card_company", (cardNumber.getText().toString().charAt(0) == '4') ? "visa" : "mastercard");
+
+
+            params.put("username", username);
+            params.put("password", password);
+            params.put("email", email);
+            params.put("card_details", cardDetails);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonRequest= new JsonObjectRequest(Request.Method.POST, URLs.URL_REGISTER, params,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressBar.setVisibility(View.GONE);
+
+                        try {
+                            JSONObject obj = response;
+
+                            Toast.makeText(getApplicationContext(), obj.getString("api_key"), Toast.LENGTH_SHORT).show();
+
+                            //TODO: get actual data from server, including card numbers
+                            User user = new User(
+                                    obj.getString("api_key"),
+                                    obj.getString("api_key"),
+                                    obj.getString("api_key"),
+                                    null
+                            );
+
+                            ArrayList<BankCard> bankCards = new ArrayList<>();
+                            JSONArray responseBankCards = obj.getJSONArray("cards");
+
+                            for (int i = 0; i < responseBankCards.length(); ++i) {
+                                JSONObject card = (JSONObject) responseBankCards.get(i);
+
+                                bankCards.add(new BankCard(
+                                        card.getString("card_number"),
+                                        card.getString("card_holder"),
+                                        card.getString("card_expiry_month"),
+                                        card.getString("card_expiry_year"),
+                                        card.getString("card_cvv"),
+                                        card.getString("card_company")
+                                ));
+                            }
+
+                            user.setCards(bankCards);
+
+                            //storing the user in shared preferences
+                            SharedPrefManager.getInstance(getApplicationContext()).userLogin(user);
+
+                            //starting the profile activity
+                            finish();
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("username", username);
+                params.put("email", email);
+                params.put("password", password);
+                return params;
+            }
+        };
+
+        progressBar.setVisibility(View.VISIBLE);
+        VolleySingleton.getInstance(this).addToRequestQueue(jsonRequest);
+    }
 }

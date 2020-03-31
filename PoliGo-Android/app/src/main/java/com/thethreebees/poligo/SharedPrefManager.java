@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class SharedPrefManager {
 
     private static final String SHARED_PREF_NAME = "volleyregisterlogin";
     private static final String KEY_USERNAME = "keyusername";
     private static final String KEY_EMAIL = "keyemail";
-    private static final String KEY_GENDER = "keygender";
+    private static final String KEY_CARDS = "keycards";
     private static final String KEY_ID = "keyid";
     private static SharedPrefManager mInstance;
     private static Context ctx;
@@ -31,7 +34,13 @@ public class SharedPrefManager {
         editor.putString(KEY_ID, user.getId());
         editor.putString(KEY_USERNAME, user.getName());
         editor.putString(KEY_EMAIL, user.getEmail());
-        editor.putString(KEY_GENDER, user.getGender());
+
+        Set<String> cards = new HashSet<>();
+
+        for (BankCard card : user.getCards())
+            cards.add(card.toString());
+
+        editor.putStringSet(KEY_CARDS, cards);
         editor.apply();
     }
 
@@ -44,12 +53,23 @@ public class SharedPrefManager {
     //this method will give the logged in user
     public User getUser() {
         SharedPreferences sharedPreferences = ctx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        return new User(
+
+        User user = new User(
                 sharedPreferences.getString(KEY_ID, null),
                 sharedPreferences.getString(KEY_USERNAME, null),
                 sharedPreferences.getString(KEY_EMAIL, null),
-                sharedPreferences.getString(KEY_GENDER, null)
+                null
         );
+
+        Set<String> cards;
+        cards = sharedPreferences.getStringSet(KEY_CARDS, null);
+
+        if (cards != null) {
+            for (String card : cards)
+                user.addCard(BankCard.fromString(card));
+        }
+
+        return user;
     }
 
     //this method will logout the user

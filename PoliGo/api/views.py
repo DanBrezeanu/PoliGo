@@ -114,6 +114,30 @@ def login(request):
 
     return HttpResponse(json.dumps({'api_key': fake_api_key}))
 
+def register(request):
+    fake_api_key = '0xCAFEBABE0xDEADBEEF'
+
+    if request.method == 'POST':
+        return HttpResponse(json.dumps(
+            {'api_key': fake_api_key,
+             'cards': [{'card_number': '5123678912341234',
+                        'card_holder': 'John Doe',
+                        'card_expiry_month': '12',
+                        'card_expiry_year': '24',
+                        'card_cvv': '123',
+                        'card_company': 'mastercard'},
+
+                       {'card_number': '4123678912341234',
+                        'card_holder': 'John Doe',
+                        'card_expiry_month': '12',
+                        'card_expiry_year': '21',
+                        'card_cvv': '345',
+                        'card_company': 'visa'},
+                      ]
+            }
+        ))
+
+
 
 # def pretul_produsului(request):
 #     user = key_to_user(request)

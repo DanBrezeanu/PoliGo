@@ -87,11 +87,12 @@ public class LoginActivity extends Activity {
 
                             Toast.makeText(getApplicationContext(), obj.getString("api_key"), Toast.LENGTH_SHORT).show();
 
+                            //TODO: get actual data from server, including card numbers
                             User user = new User(
                                     obj.getString("api_key"),
                                     obj.getString("api_key"),
                                     obj.getString("api_key"),
-                                    obj.getString("api_key")
+                                    null
                             );
 
                             //storing the user in shared preferences

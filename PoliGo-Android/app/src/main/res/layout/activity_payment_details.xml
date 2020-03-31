@@ -140,6 +140,7 @@
             android:layout_marginBottom="8dp"
             android:layout_width="210dp"
             android:layout_height="50dp"
+            android:onClick="onRegisterUser"
             android:layout_gravity="center_horizontal"
             android:text="Register" />
 

@@ -1,13 +1,16 @@
 package com.thethreebees.poligo;
 
+import java.util.ArrayList;
+
 public class User {
     private String id;
-    private String name, email, gender;
+    private String name, email;
+    private ArrayList<BankCard> cards;
 
-    public User(String id, String name, String email, String gender) {
+    public User(String id, String name, String email, ArrayList<BankCard> cards) {
         this.id = id;
         this.email = email;
-        this.gender = gender;
+        this.cards = cards;
         this.name = name;
     }
 
@@ -35,12 +38,27 @@ public class User {
         this.email = email;
     }
 
-
-    public String getGender() {
-        return gender;
+    public void setCards(ArrayList<BankCard> cards) {
+        this.cards = cards;
     }
 
-    public void setGender(String gender) {
-        this.gender = gender;
+    public ArrayList<BankCard> getCards() {
+        return cards;
     }
+
+    public void addCard(BankCard cardNumber) {
+        if (cards == null) {
+            cards = new ArrayList<>();
+        }
+
+        this.cards.add(cardNumber);
+    }
+
+    public void removeCardNumber(BankCard cardNumber) {
+        if (cards == null)
+            return;
+
+        cards.remove(cardNumber);
+    }
+
 }
