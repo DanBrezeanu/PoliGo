@@ -3,6 +3,7 @@ package com.thethreebees.poligo;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -44,6 +46,12 @@ public class CheckoutActivity extends Activity implements AdapterView.OnItemSele
         CardItemAdapter customAdapter = new CardItemAdapter(getApplicationContext(),
                                             cardCompanies, cardNumbers);
         spin.setAdapter(customAdapter);
+
+
+        TextView totalSum = findViewById(R.id.total_sum);
+
+        Intent parentIntent = getIntent();
+        totalSum.setText(String.format("%s RON", parentIntent.getStringExtra("totalSum")));
     }
 
     @Override
@@ -52,4 +60,13 @@ public class CheckoutActivity extends Activity implements AdapterView.OnItemSele
     @Override
     public void onNothingSelected(AdapterView<?> arg0) { }
 
+    public void onBackToCart(View v) {
+        finish();
+    }
+
+    public void onPaymentConfirmed(View v) {
+        Intent backToMain = new Intent(CheckoutActivity.this, MainActivity.class);
+        startActivity(backToMain);
+        finish();
+    }
 }

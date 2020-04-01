@@ -36,16 +36,16 @@ public class ProductAdapter extends BaseAdapter {
             if (prod.getSKU().equals(SKUProduct)) {
                 products.remove(prod);
 
-                ((ShoppingList) context).cart.removeProduct(SKUProduct);
-                ((TextView) ((ShoppingList) context).findViewById(R.id.total_sum)).
-                        setText(((ShoppingList) context).cart.getTotalSum().toString());
+                ((ShoppingListActivity) context).cart.removeProduct(SKUProduct);
+                ((TextView) ((ShoppingListActivity) context).findViewById(R.id.total_sum)).
+                        setText(((ShoppingListActivity) context).cart.getTotalSum().toString());
 
                 break;
             }
         }
 
         if (getCount() <= 0)
-            ((ShoppingList) context).findViewById(R.id.finished_shopping).setVisibility(View.GONE);
+            ((ShoppingListActivity) context).findViewById(R.id.finished_shopping).setVisibility(View.GONE);
         this.notifyDataSetChanged();
     }
 

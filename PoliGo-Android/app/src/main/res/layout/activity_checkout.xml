@@ -108,6 +108,7 @@
             android:id="@+id/back_to_cart"
             android:layout_width="0dp"
             android:layout_weight="0.5"
+            android:onClick="onBackToCart"
             android:layout_height="match_parent"
             android:background="@drawable/full_screen_button_all_margins"
             android:text="Back to shopping list" />
@@ -116,6 +117,7 @@
             android:id="@+id/confirm_button"
             android:layout_width="0dp"
             android:layout_weight="0.5"
+            android:onClick="onPaymentConfirmed"
             android:layout_height="match_parent"
             android:background="@drawable/full_screen_button"
             android:text="Confirm payment" />

@@ -30,7 +30,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 
-public class ShoppingList extends Activity {
+public class ShoppingListActivity extends Activity {
     private ListView productList;
     ProductAdapter productAdapter;
     private EditText addNewProduct;
@@ -40,6 +40,7 @@ public class ShoppingList extends Activity {
     String result;
     HashMap<String, String> params = new HashMap<>();
     ProgressBar progressBar;
+    TextView totalSum;
     Context context;
     public ShoppingCart cart;
 
@@ -53,6 +54,7 @@ public class ShoppingList extends Activity {
         productList = findViewById(R.id.list_item);
         addButton = findViewById(R.id.btn_add_prod);
         progressBar = findViewById(R.id.progressBar);
+        totalSum = findViewById(R.id.total_sum);
 
         productAdapter = new ProductAdapter(this);
         cart = new ShoppingCart();
@@ -97,7 +99,7 @@ public class ShoppingList extends Activity {
                                     if (response.getInt("code") == 200 && response.getJSONArray("products").length() > 0) {
                                         JSONObject prod = (JSONObject) response.getJSONArray("products").get(0);
 
-                                        ((ShoppingList) context).productAdapter.addProduct(
+                                        ((ShoppingListActivity) context).productAdapter.addProduct(
                                                 prod.getString("SKU"),
                                                 prod.getString("name"),
                                                 prod.getDouble("price"),
@@ -111,12 +113,12 @@ public class ShoppingList extends Activity {
                                             image
                                         ));
 
-                                        ((TextView) ((ShoppingList) context).findViewById(R.id.total_sum)).setText(cart.getTotalSum().toString());
+                                        totalSum.setText(cart.getTotalSum().toString());
 
-                                        ((ShoppingList) context).findViewById(R.id.finished_shopping).setVisibility(View.VISIBLE);
+                                        ((ShoppingListActivity) context).findViewById(R.id.finished_shopping).setVisibility(View.VISIBLE);
 
                                     } else {
-                                        AlertDialog alertDialog = new AlertDialog.Builder((ShoppingList)context )
+                                        AlertDialog alertDialog = new AlertDialog.Builder((ShoppingListActivity)context )
                                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                                 .setMessage("This product does not exist")
                                                 .setNeutralButton("OK", new DialogInterface.OnClickListener() {
@@ -150,8 +152,9 @@ public class ShoppingList extends Activity {
 
 
     public void onFinishedShopping(View v) {
-        Intent scanCodeIntent = new Intent(this, CheckoutActivity.class);
-        startActivityForResult(scanCodeIntent, LAUNCH_BARCODE_SCANNING);
+        Intent checkoutIntent = new Intent(this, CheckoutActivity.class);
+        checkoutIntent.putExtra("totalSum", totalSum.getText().toString());
+        startActivity(checkoutIntent);
     }
 
     @Override
