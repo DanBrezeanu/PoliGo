@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        SharedPrefManager.getInstance(this).clearShoppingCart();
+
         if(!SharedPrefManager.getInstance(this).isLoggedIn()){
             Intent  intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);

@@ -4,22 +4,34 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+
+import net.glxn.qrgen.android.QRCode;
+
 import java.util.ArrayList;
+
+import static java.lang.Thread.sleep;
 
 public class CheckoutActivity extends Activity implements AdapterView.OnItemSelectedListener{
 
     Spinner spinner;
     int[] cardCompanies;
     String[] cardNumbers;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +41,7 @@ public class CheckoutActivity extends Activity implements AdapterView.OnItemSele
         Spinner spin = (Spinner) findViewById(R.id.dropdown_cards);
         spin.setOnItemSelectedListener(CheckoutActivity.this);
 
+        progressBar = findViewById(R.id.progressBar);
 
         ArrayList<BankCard> userCards = SharedPrefManager.getInstance(this).getUser().getCards();
 
@@ -65,7 +78,9 @@ public class CheckoutActivity extends Activity implements AdapterView.OnItemSele
     }
 
     public void onPaymentConfirmed(View v) {
-        Intent backToMain = new Intent(CheckoutActivity.this, MainActivity.class);
+        SharedPrefManager.getInstance(this).clearShoppingCart();
+
+        Intent backToMain = new Intent(CheckoutActivity.this, QRCodeActivity.class);
         startActivity(backToMain);
         finish();
     }

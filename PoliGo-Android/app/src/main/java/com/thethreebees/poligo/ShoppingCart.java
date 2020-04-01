@@ -1,12 +1,13 @@
 package com.thethreebees.poligo;
 
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class ShoppingCart {
-    private ArrayList<Product> products;
+    private ArrayList<Pair<Product, Integer>> products;
     private Double totalSum;
 
     public ShoppingCart() {
@@ -22,11 +23,11 @@ public class ShoppingCart {
         this.totalSum = totalSum;
     }
 
-    public ArrayList<Product> getProducts() {
+    public ArrayList<Pair<Product, Integer>> getProducts() {
         return products;
     }
 
-    public void setProducts(ArrayList<Product> products) {
+    public void setProducts(ArrayList<Pair<Product, Integer>> products) {
         this.products = products;
     }
 
@@ -35,17 +36,30 @@ public class ShoppingCart {
     }
 
     public void addProduct(Product p) {
-        products.add(p);
+
+        for (int i = 0; i < products.size(); ++i) {
+            if (products.get(i).first.equals(p)) {
+                products.set(i, new Pair<>(products.get(i).first,
+                                           products.get(i).second + 1));
+
+                totalSum += p.getPrice();
+                return;
+            }
+        }
+
+        products.add(new Pair<>(p, 1));
         totalSum += p.getPrice();
     }
 
     public synchronized void removeProduct(String SKU) {
         for (int i = 0; i < products.size(); ++i) {
-            if (products.get(i).getSKU().equals(SKU)) {
-                Log.d("Removed", "product");
+            if (products.get(i).first.getSKU().equals(SKU)) {
+                totalSum = Math.max(totalSum - products.get(i).first.getPrice(), 0);
 
-                totalSum = Math.max(totalSum - products.get(i).getPrice(), 0);
-                products.remove(products.get(i));
+                if (products.get(i).second == 1)
+                    products.remove(products.get(i));
+                else
+                    products.set(i, new Pair<>(products.get(i).first, products.get(i).second - 1));
                 return;
             }
         }

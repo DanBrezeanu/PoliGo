@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,14 +69,8 @@ public class ShoppingListActivity extends Activity {
     public void resumeShopping() {
         cart = sharedPref.getShoppingCart();
 
-        for (Product prod : cart.getProducts()) {
-            System.out.println("Added products XXXXX");
-            productAdapter.addProduct(
-                    prod.getSKU(),
-                    prod.getName(),
-                    prod.getPrice(),
-                    image
-            );
+        for (Pair<Product, Integer> prod : cart.getProducts()) {
+            productAdapter.addProduct(prod.first, prod.second);
         }
 
         totalSum.setText(cart.getTotalSum().toString());
@@ -120,19 +115,17 @@ public class ShoppingListActivity extends Activity {
                                     if (response.getInt("code") == 200 && response.getJSONArray("products").length() > 0) {
                                         JSONObject prod = (JSONObject) response.getJSONArray("products").get(0);
 
-                                        ((ShoppingListActivity) context).productAdapter.addProduct(
+
+                                        Product new_prod = new Product(
                                                 prod.getString("SKU"),
                                                 prod.getString("name"),
                                                 prod.getDouble("price"),
                                                 image
                                         );
 
-                                        cart.addProduct(new Product(
-                                            prod.getString("SKU"),
-                                            prod.getString("name"),
-                                            prod.getDouble("price"),
-                                            image
-                                        ));
+                                        ((ShoppingListActivity) context).productAdapter.addProduct(new_prod, 1);
+
+//                                        cart.addProduct(new_prod);
 
                                         sharedPref.registerShoppingCart(cart);
 

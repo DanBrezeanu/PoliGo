@@ -3,9 +3,11 @@ package com.thethreebees.poligo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Pair;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class SharedPrefManager {
 
@@ -91,10 +93,14 @@ public class SharedPrefManager {
         Set<String> products = sharedPreferences.getStringSet("products", null);
         ShoppingCart cart = new ShoppingCart();
 
-        if (products != null)
-            for (String prodString : products)
-                cart.addProduct(Product.fromString(prodString));
+        if (products != null) {
+            for (String prodString : products) {
+                String[] quant_prod = prodString.split(Pattern.quote("%%"));
 
+                for (int i = 0; i < Integer.parseInt(quant_prod[0]); ++i)
+                    cart.addProduct(Product.fromString(quant_prod[1]));
+            }
+        }
 
         Double total_sum = Double.valueOf(sharedPreferences.getFloat("total_sum", 0.0f));
         cart.setTotalSum(total_sum);
@@ -108,8 +114,8 @@ public class SharedPrefManager {
 
         HashSet<String> prodStrings = new HashSet<>();
 
-        for (Product prod : cart.getProducts()) {
-            prodStrings.add(prod.toString() + "|" + cart.getProducts().indexOf(prod));
+        for (Pair<Product, Integer> prod : cart.getProducts()) {
+            prodStrings.add(prod.second + "%%" + prod.first.toString());
         }
 
         editor.putStringSet("products", prodStrings);

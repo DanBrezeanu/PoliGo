@@ -1,11 +1,14 @@
 package com.thethreebees.poligo;
 
 import android.app.Activity;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,28 +19,44 @@ import java.util.regex.Pattern;
 
 public class ProductAdapter extends BaseAdapter {
     private Activity context;
-    private ArrayList<Product> products;
+    private ArrayList<Pair<Product, Integer>> products;
 
     public ProductAdapter (Activity context) {
         this.context = context;
         products = new ArrayList<>();
     }
 
-    public void addProduct(String SKUProduct, String nameProduct, Double priceProduct, int resource) {
-        Product product = new Product(
-            SKUProduct,
-            nameProduct,
-            priceProduct,
-            resource
-        );
-        products.add(product);
+    public void addProduct(Product product, int quant) {
+        boolean added_product = false;
+
+        for (int i = 0; i < products.size(); ++i) {
+            if (products.get(i).first.getSKU().equals(product.getSKU())){
+                products.set(i, new Pair<>(products.get(i).first, products.get(i).second + quant));
+                ((ShoppingListActivity) context).cart.addProduct(products.get(i).first);
+                added_product = true;
+                break;
+            }
+        }
+
+
+        if (!added_product)
+            products.add(new Pair<>(product, 1));
+
+        ((TextView) ((ShoppingListActivity) context).findViewById(R.id.total_sum)).
+                setText(((ShoppingListActivity) context).cart.getTotalSum().toString());
+
         this.notifyDataSetChanged();
     }
 
     public void removeProduct(String SKUProduct) {
-        for (Product prod : products) {
-            if (prod.getSKU().equals(SKUProduct)) {
-                products.remove(prod);
+        for (int i = 0; i < products.size(); ++i) {
+            if (products.get(i).first.getSKU().equals(SKUProduct)) {
+
+                if (products.get(i).second > 1) {
+                    products.set(i, new Pair<>(products.get(i).first, products.get(i).second - 1));
+                } else {
+                    products.remove(products.get(i));
+                }
 
                 ((ShoppingListActivity) context).cart.removeProduct(SKUProduct);
                 ((TextView) ((ShoppingListActivity) context).findViewById(R.id.total_sum)).
@@ -53,7 +72,7 @@ public class ProductAdapter extends BaseAdapter {
     }
 
     public View getView(final int i, View view, ViewGroup viewGroup) {
-        View element;
+        final View element;
         if(view == null)
         {
             LayoutInflater layoutInflater = context.getLayoutInflater();
@@ -66,14 +85,46 @@ public class ProductAdapter extends BaseAdapter {
         product.name = element.findViewById(R.id.tv_name_element);
         product.price = element.findViewById(R.id.tv_price_element);
         product.image = element.findViewById(R.id.iv_image_element);
-
+        final EditText quantity = element.findViewById(R.id.et_quantity);
 
         final Button remove = element.findViewById(R.id.tv_SKU_element);
         remove.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        removeProduct(products.get(i).getSKU());
+                        int totalQuantity = Integer.parseInt(quantity.getText().toString());
+
+                        for (int i = 0; i < totalQuantity; ++i)
+                            removeProduct(products.get(i).first.getSKU());
+
+                        SharedPrefManager.getInstance(context).registerShoppingCart(
+                                ((ShoppingListActivity) context).cart
+                        );
+                    }
+                }
+        );
+
+        final ImageButton increment_quantity = element.findViewById(R.id.add_quantity);
+        increment_quantity.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        addProduct(products.get(i).first, 1);
+                        quantity.setText(products.get(i).second.toString());
+                        SharedPrefManager.getInstance(context).registerShoppingCart(
+                                ((ShoppingListActivity) context).cart
+                        );
+                    }
+                }
+        );
+
+        final ImageButton decrement_quantity = element.findViewById(R.id.remove_quantity);
+        decrement_quantity.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        removeProduct(products.get(i).first.getSKU());
+                        quantity.setText(products.get(i).second.toString());
                         SharedPrefManager.getInstance(context).registerShoppingCart(
                                 ((ShoppingListActivity) context).cart
                         );
@@ -85,9 +136,9 @@ public class ProductAdapter extends BaseAdapter {
         element.setTag(product);
 
         TagProduct tag = (TagProduct) element.getTag();
-        tag.name.setText(products.get(i).getName());
-        tag.price.setText(products.get(i).getPrice().toString());
-        tag.image.setImageResource(products.get(i).getImageResource());
+        tag.name.setText(products.get(i).first.getName());
+        tag.price.setText(products.get(i).first.getPrice().toString());
+        tag.image.setImageResource(products.get(i).first.getImageResource());
         return element;
     }
 
