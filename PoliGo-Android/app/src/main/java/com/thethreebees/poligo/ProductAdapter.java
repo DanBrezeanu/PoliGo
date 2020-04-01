@@ -9,7 +9,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class ProductAdapter extends BaseAdapter {
     private Activity context;
@@ -71,6 +74,9 @@ public class ProductAdapter extends BaseAdapter {
                     @Override
                     public void onClick(View view) {
                         removeProduct(products.get(i).getSKU());
+                        SharedPrefManager.getInstance(context).registerShoppingCart(
+                                ((ShoppingListActivity) context).cart
+                        );
                     }
                 }
         );
@@ -104,15 +110,12 @@ public class ProductAdapter extends BaseAdapter {
 
 
 class Product {
-    public Product() {
-    }
-
-
     private String SKU;
     private String name;
     private Double price;
     private int imageResource;
 
+    public Product() { }
 
     public Product(String SKU, String name, Double price, int imageResource) {
         this.SKU = SKU;
@@ -151,6 +154,20 @@ class Product {
 
     public void setImageResource(int imageResource) {
         this.imageResource = imageResource;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return String.format("%s|%s|%f|%d", SKU, name, price, imageResource);
+    }
+
+    public static Product fromString(String productString) {
+            String[] productPattern = productString.split(Pattern.quote("|"));
+
+            return new Product(productPattern[0], productPattern[1], Double.parseDouble(productPattern[2]),
+                               Integer.parseInt(productPattern[3]));
+
     }
 }
 

@@ -43,6 +43,7 @@ public class ShoppingListActivity extends Activity {
     TextView totalSum;
     Context context;
     public ShoppingCart cart;
+    SharedPrefManager sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class ShoppingListActivity extends Activity {
         setContentView(R.layout.activity_shopping_list);
 
         context = this;
+        sharedPref = SharedPrefManager.getInstance(this);
 
         productList = findViewById(R.id.list_item);
         addButton = findViewById(R.id.btn_add_prod);
@@ -57,10 +59,29 @@ public class ShoppingListActivity extends Activity {
         totalSum = findViewById(R.id.total_sum);
 
         productAdapter = new ProductAdapter(this);
-        cart = new ShoppingCart();
 
         productList.setAdapter(productAdapter);
 
+        resumeShopping();
+    }
+
+    public void resumeShopping() {
+        cart = sharedPref.getShoppingCart();
+
+        for (Product prod : cart.getProducts()) {
+            System.out.println("Added products XXXXX");
+            productAdapter.addProduct(
+                    prod.getSKU(),
+                    prod.getName(),
+                    prod.getPrice(),
+                    image
+            );
+        }
+
+        totalSum.setText(cart.getTotalSum().toString());
+
+        if (cart.getCount() > 0)
+            ((ShoppingListActivity) context).findViewById(R.id.finished_shopping).setVisibility(View.VISIBLE);
     }
 
     public void onScanCode(View v) {
@@ -112,6 +133,8 @@ public class ShoppingListActivity extends Activity {
                                             prod.getDouble("price"),
                                             image
                                         ));
+
+                                        sharedPref.registerShoppingCart(cart);
 
                                         totalSum.setText(cart.getTotalSum().toString());
 

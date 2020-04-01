@@ -14,6 +14,9 @@ public class SharedPrefManager {
     private static final String KEY_EMAIL = "keyemail";
     private static final String KEY_CARDS = "keycards";
     private static final String KEY_ID = "keyid";
+
+    private static final String SHARED_CART_NAME = "shoppingcartpref";
+
     private static SharedPrefManager mInstance;
     private static Context ctx;
 
@@ -80,4 +83,46 @@ public class SharedPrefManager {
         editor.apply();
         ctx.startActivity(new Intent(ctx, LoginActivity.class));
     }
+
+
+    public ShoppingCart getShoppingCart() {
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(SHARED_CART_NAME, Context.MODE_PRIVATE);
+
+        Set<String> products = sharedPreferences.getStringSet("products", null);
+        ShoppingCart cart = new ShoppingCart();
+
+        if (products != null)
+            for (String prodString : products)
+                cart.addProduct(Product.fromString(prodString));
+
+
+        Double total_sum = Double.valueOf(sharedPreferences.getFloat("total_sum", 0.0f));
+        cart.setTotalSum(total_sum);
+
+        return cart;
+    }
+
+    public void registerShoppingCart(ShoppingCart cart) {
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(SHARED_CART_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        HashSet<String> prodStrings = new HashSet<>();
+
+        for (Product prod : cart.getProducts()) {
+            prodStrings.add(prod.toString() + "|" + cart.getProducts().indexOf(prod));
+        }
+
+        editor.putStringSet("products", prodStrings);
+        editor.putFloat("total_sum", cart.getTotalSum().floatValue());
+
+        editor.apply();
+    }
+
+    public void clearShoppingCart() {
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(SHARED_CART_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+    }
+
 }
