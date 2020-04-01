@@ -59,19 +59,15 @@ public class ShoppingListActivity extends Activity {
         progressBar = findViewById(R.id.progressBar);
         totalSum = findViewById(R.id.total_sum);
 
-        productAdapter = new ProductAdapter(this);
-
-        productList.setAdapter(productAdapter);
-
         resumeShopping();
     }
 
     public void resumeShopping() {
         cart = sharedPref.getShoppingCart();
+        System.out.println(cart.getCount());
 
-        for (Pair<Product, Integer> prod : cart.getProducts()) {
-            productAdapter.addProduct(prod.first, prod.second);
-        }
+        productAdapter = new ProductAdapter(this);
+        productList.setAdapter(productAdapter);
 
         totalSum.setText(cart.getTotalSum().toString());
 
@@ -125,13 +121,6 @@ public class ShoppingListActivity extends Activity {
 
                                         ((ShoppingListActivity) context).productAdapter.addProduct(new_prod, 1);
 
-//                                        cart.addProduct(new_prod);
-
-                                        sharedPref.registerShoppingCart(cart);
-
-                                        totalSum.setText(cart.getTotalSum().toString());
-
-                                        ((ShoppingListActivity) context).findViewById(R.id.finished_shopping).setVisibility(View.VISIBLE);
 
                                     } else {
                                         AlertDialog alertDialog = new AlertDialog.Builder((ShoppingListActivity)context )

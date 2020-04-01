@@ -19,62 +19,39 @@ import java.util.regex.Pattern;
 
 public class ProductAdapter extends BaseAdapter {
     private Activity context;
+    private ShoppingCart cart;
+    private SharedPrefManager sharedPref;
+    private TextView totalSumTextView;
+    private Button finishedShopping;
     private ArrayList<Pair<Product, Integer>> products;
 
     public ProductAdapter (Activity context) {
         this.context = context;
-        products = new ArrayList<>();
+        cart = ((ShoppingListActivity) context).cart;
+        sharedPref = SharedPrefManager.getInstance(context);
+        totalSumTextView = context.findViewById(R.id.total_sum);
+        finishedShopping = context.findViewById(R.id.finished_shopping);
+        products = cart.getProducts();
     }
 
     public void addProduct(Product product, int quant) {
-        boolean added_product = false;
-
-        for (int i = 0; i < products.size(); ++i) {
-            if (products.get(i).first.getSKU().equals(product.getSKU())){
-                products.set(i, new Pair<>(products.get(i).first, products.get(i).second + quant));
-                ((ShoppingListActivity) context).cart.addProduct(products.get(i).first);
-                added_product = true;
-                break;
-            }
-        }
-
-
-        if (!added_product)
-            products.add(new Pair<>(product, 1));
-
-        ((TextView) ((ShoppingListActivity) context).findViewById(R.id.total_sum)).
-                setText(((ShoppingListActivity) context).cart.getTotalSum().toString());
+        cart.addProduct(product);
+        sharedPref.registerShoppingCart(cart);
 
         this.notifyDataSetChanged();
     }
 
     public void removeProduct(String SKUProduct) {
-        for (int i = 0; i < products.size(); ++i) {
-            if (products.get(i).first.getSKU().equals(SKUProduct)) {
+        cart.removeProduct(SKUProduct);
+        sharedPref.registerShoppingCart(cart);
 
-                if (products.get(i).second > 1) {
-                    products.set(i, new Pair<>(products.get(i).first, products.get(i).second - 1));
-                } else {
-                    products.remove(products.get(i));
-                }
-
-                ((ShoppingListActivity) context).cart.removeProduct(SKUProduct);
-                ((TextView) ((ShoppingListActivity) context).findViewById(R.id.total_sum)).
-                        setText(((ShoppingListActivity) context).cart.getTotalSum().toString());
-
-                break;
-            }
-        }
-
-        if (getCount() <= 0)
-            ((ShoppingListActivity) context).findViewById(R.id.finished_shopping).setVisibility(View.GONE);
         this.notifyDataSetChanged();
     }
 
     public View getView(final int i, View view, ViewGroup viewGroup) {
         final View element;
-        if(view == null)
-        {
+
+        if(view == null) {
             LayoutInflater layoutInflater = context.getLayoutInflater();
             element = layoutInflater.inflate(R.layout.product_list, null);
         }
@@ -85,21 +62,20 @@ public class ProductAdapter extends BaseAdapter {
         product.name = element.findViewById(R.id.tv_name_element);
         product.price = element.findViewById(R.id.tv_price_element);
         product.image = element.findViewById(R.id.iv_image_element);
-        final EditText quantity = element.findViewById(R.id.et_quantity);
+        product.quantity = element.findViewById(R.id.et_quantity);
 
         final Button remove = element.findViewById(R.id.tv_SKU_element);
         remove.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        int totalQuantity = Integer.parseInt(quantity.getText().toString());
+                        int totalQuantity = Integer.parseInt(product.quantity.getText().toString());
 
-                        for (int i = 0; i < totalQuantity; ++i)
+                        for (int j = 0; j < totalQuantity; ++j)
                             removeProduct(products.get(i).first.getSKU());
 
-                        SharedPrefManager.getInstance(context).registerShoppingCart(
-                                ((ShoppingListActivity) context).cart
-                        );
+                        reloadElementsUI();
+                        ProductAdapter.this.notifyDataSetChanged();
                     }
                 }
         );
@@ -110,10 +86,10 @@ public class ProductAdapter extends BaseAdapter {
                     @Override
                     public void onClick(View view) {
                         addProduct(products.get(i).first, 1);
-                        quantity.setText(products.get(i).second.toString());
-                        SharedPrefManager.getInstance(context).registerShoppingCart(
-                                ((ShoppingListActivity) context).cart
-                        );
+                        product.quantity.setText(products.get(i).second.toString());
+
+                        reloadElementsUI();
+                        ProductAdapter.this.notifyDataSetChanged();
                     }
                 }
         );
@@ -123,11 +99,15 @@ public class ProductAdapter extends BaseAdapter {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        int initial_quant = products.get(i).second;
+
                         removeProduct(products.get(i).first.getSKU());
-                        quantity.setText(products.get(i).second.toString());
-                        SharedPrefManager.getInstance(context).registerShoppingCart(
-                                ((ShoppingListActivity) context).cart
-                        );
+
+                        if (initial_quant > 1)
+                            product.quantity.setText(products.get(i).second.toString());
+
+                        reloadElementsUI();
+                        ProductAdapter.this.notifyDataSetChanged();
                     }
                 }
         );
@@ -139,9 +119,21 @@ public class ProductAdapter extends BaseAdapter {
         tag.name.setText(products.get(i).first.getName());
         tag.price.setText(products.get(i).first.getPrice().toString());
         tag.image.setImageResource(products.get(i).first.getImageResource());
+        tag.quantity.setText(products.get(i).second.toString());
+
+        reloadElementsUI();
         return element;
     }
 
+
+    void reloadElementsUI() {
+        totalSumTextView.setText(cart.getTotalSum().toString());
+
+        if (cart.getCount() <= 0)
+            finishedShopping.setVisibility(View.GONE);
+        else
+            finishedShopping.setVisibility(View.VISIBLE);
+    }
 
     @Override
     public int getCount() {
@@ -226,6 +218,7 @@ class TagProduct {
     TextView name;
     TextView price;
     ImageView image;
+    EditText quantity;
 }
 
 

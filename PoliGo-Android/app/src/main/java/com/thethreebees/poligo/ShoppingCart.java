@@ -38,7 +38,7 @@ public class ShoppingCart {
     public void addProduct(Product p) {
 
         for (int i = 0; i < products.size(); ++i) {
-            if (products.get(i).first.equals(p)) {
+            if (products.get(i).first.getSKU().equals(p.getSKU())) {
                 products.set(i, new Pair<>(products.get(i).first,
                                            products.get(i).second + 1));
 
