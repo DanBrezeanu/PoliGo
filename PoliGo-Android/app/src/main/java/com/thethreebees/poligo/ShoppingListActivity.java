@@ -142,6 +142,7 @@ public class ShoppingListActivity extends Activity {
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
+                                progressBar.setVisibility(View.GONE);
                                 Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
 
                             }
@@ -160,25 +161,5 @@ public class ShoppingListActivity extends Activity {
         Intent checkoutIntent = new Intent(this, CheckoutActivity.class);
         checkoutIntent.putExtra("totalSum", totalSum.getText().toString());
         startActivity(checkoutIntent);
-    }
-
-    @Override
-    public void onBackPressed() {
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Are you sure you want to exit?")
-                .setMessage("Your shoppings will NOT be saved")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {}
-                })
-                .show();
-
     }
 }

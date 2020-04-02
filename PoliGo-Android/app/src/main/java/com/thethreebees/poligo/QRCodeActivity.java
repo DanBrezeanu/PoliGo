@@ -27,4 +27,9 @@ public class QRCodeActivity extends AppCompatActivity {
         startActivity(backToMain);
         finish();
     }
+
+    @Override
+    public void onBackPressed() {
+        return;
+    }
 }
