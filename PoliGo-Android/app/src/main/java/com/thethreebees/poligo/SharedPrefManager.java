@@ -42,8 +42,9 @@ public class SharedPrefManager {
 
         Set<String> cards = new HashSet<>();
 
-        for (BankCard card : user.getCards())
-            cards.add(card.toString());
+        if (user.getCards() != null)
+            for (BankCard card : user.getCards())
+                cards.add(card.toString());
 
         editor.putStringSet(KEY_CARDS, cards);
         editor.apply();

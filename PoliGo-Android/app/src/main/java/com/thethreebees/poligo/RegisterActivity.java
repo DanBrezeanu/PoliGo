@@ -3,12 +3,14 @@ package com.thethreebees.poligo;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,6 +45,10 @@ public class RegisterActivity extends Activity {
         editTextUsername = findViewById(R.id.editTextUsername);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
+
+        TextView loginText = findViewById(R.id.textViewLogin);
+        String sourceString = loginText.getText().toString() + "<b>Login now</b>";
+        loginText.setText(Html.fromHtml(sourceString));
 
 
         findViewById(R.id.buttonRegister).setOnClickListener(new View.OnClickListener() {

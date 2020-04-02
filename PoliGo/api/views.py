@@ -137,6 +137,55 @@ def register(request):
             }
         ))
 
+def shopping_history(request):
+    if request.method == 'GET':
+        return HttpResponse(json.dumps(
+            {'carts': [
+                {
+                    'number': 1,
+                    'date': '12/03/2020',
+                    'total_sum': 120.1,
+                    'products': 
+                    [
+                        {
+                            'SKU': '59474982',
+                            'name': 'Heets Bronze',
+                            'price': 17.0,
+                            'quantity': 2
+                        },
+                        {
+                            'SKU': '5948874114230',
+                            'name': 'Touch',
+                            'price': 20.0,
+                            'quantity': 3
+                        }
+                    ]
+                },
+                {
+                    'number': 2,
+                    'date': '13/03/2020',
+                    'total_sum': 230.1,
+                    'products': 
+                        [
+                        {
+                            'SKU': '59474982',
+                            'name': 'Heets Bronze',
+                            'price': 17.0,
+                            'quantity': 2
+                        },
+                        {
+                            'SKU': '5948874114230',
+                            'name': 'Touch',
+                            'price': 20.0,
+                            'quantity': 4
+                        }
+                        ]
+                    }
+                ]
+            }
+           
+        ))
+
 
 
 # def pretul_produsului(request):

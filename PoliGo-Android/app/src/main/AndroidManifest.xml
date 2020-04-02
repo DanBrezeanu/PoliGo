@@ -18,7 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".QRCodeActivity"></activity>
+        <activity android:name=".ShoppingHistoryActivity"></activity>
+        <activity android:name=".QRCodeActivity" />
         <activity android:name=".CheckoutActivity" />
         <activity android:name=".PaymentDetailsActivity" />
         <activity android:name=".RegisterActivity" />

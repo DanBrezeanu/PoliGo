@@ -3,10 +3,12 @@ package com.thethreebees.poligo;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -37,6 +39,10 @@ public class LoginActivity extends Activity {
         progressBar = findViewById(R.id.progressBar);
         etName = findViewById(R.id.etUserName);
         etPassword = findViewById(R.id.etUserPassword);
+
+        TextView registerText = findViewById(R.id.tvRegister);
+        String sourceString = registerText.getText().toString() + "<b>Sign Up</b>";
+        registerText.setText(Html.fromHtml(sourceString));
 
 
 
@@ -125,5 +131,10 @@ public class LoginActivity extends Activity {
         VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
         progressBar.setVisibility(View.VISIBLE);
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        return;
     }
 }

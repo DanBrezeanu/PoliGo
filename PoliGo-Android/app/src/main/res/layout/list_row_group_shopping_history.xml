@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+
+    <TextView
+        android:id="@+id/cart_number"
+        android:layout_width="0dp"
+        android:layout_weight="0.2"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textColor="#CDCDCD"
+        android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:layout_gravity="start|center_vertical"
+        android:text="#20"
+        android:textSize="17dp" />
+
+    <TextView
+        android:id="@+id/cart_date"
+        android:layout_width="0dp"
+        android:layout_weight="0.6"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textColor="@color/theOrange"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="01/02/03"
+        android:textSize="17dp" />
+
+    <TextView
+        android:id="@+id/cart_sum"
+        android:layout_width="0dp"
+        android:layout_weight="0.3"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textColor="#000000"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="12323 RON"
+        android:textSize="17dp" />
+
+</LinearLayout>

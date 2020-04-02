@@ -20,8 +20,6 @@ import android.widget.TextView;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 
-import net.glxn.qrgen.android.QRCode;
-
 import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;

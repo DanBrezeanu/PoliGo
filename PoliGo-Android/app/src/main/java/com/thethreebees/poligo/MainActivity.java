@@ -76,14 +76,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int id = item.getItemId();
                 switch(id)
                 {
-                    case R.id.account:
-                        Toast.makeText(MainActivity.this, "My Account",Toast.LENGTH_SHORT).show();break;
-                    case R.id.settings:
-                        Toast.makeText(MainActivity.this, "Settings",Toast.LENGTH_SHORT).show();break;
-                    case R.id.mycart:
-                        Toast.makeText(MainActivity.this, "My Cart", Toast.LENGTH_SHORT).show();break;
-                    default:
-                        return true;
+                case R.id.account:
+                    Toast.makeText(MainActivity.this, "My Account",Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.history:
+                    Toast.makeText(MainActivity.this, "Settings",Toast.LENGTH_SHORT).show();
+                    Intent toShoppingHistory = new Intent(MainActivity.this, ShoppingHistoryActivity.class);
+                    startActivity(toShoppingHistory);
+                    finish();
+                    break;
+                case R.id.mycart:
+                    Intent toCart = new Intent(MainActivity.this, ShoppingListActivity.class);
+                    startActivity(toCart);
+                    finish();
+                    break;
+                default:
+                    return true;
                 }
 
                 return true;
@@ -112,6 +120,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
+    public void onLogout(View view) {
+        SharedPrefManager.getInstance(this).logout();
+    }
 
     public void onClick(View view){
         if(view.equals(btnLogout)){
@@ -129,6 +140,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void exitApp(View v) {
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
         finish();
     }
 
