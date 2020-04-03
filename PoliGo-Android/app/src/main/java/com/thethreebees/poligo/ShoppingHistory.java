@@ -63,10 +63,10 @@ public class ShoppingHistory {
                                 JSONObject cart = (JSONObject) shoppingCarts.get(i);
 
                                 HashMap<String, String> cartInfoJson = new HashMap<>();
-                                String cartNumber = cartInfoJson.put("number", String.format("%d", cart.getInt("number")));
+                                String cartNumber = String.format("%d", cart.getInt("number"));
                                 cartInfoJson.put("number", cartNumber);
                                 cartInfoJson.put("date", cart.getString("date"));
-                                cartInfoJson.put("totalSum",  String.format("%f", cart.getDouble("number")));
+                                cartInfoJson.put("totalSum",  String.format("%.2f", cart.getDouble("total_sum")));
 
                                 cartInfo.add(cartInfoJson);
 
@@ -74,7 +74,7 @@ public class ShoppingHistory {
                                 ArrayList<Pair<Product, Integer>> newProducts = new ArrayList<>();
 
                                 for (int j = 0; j < products.length(); ++j) {
-                                    JSONObject prod = (JSONObject) products.get(i);
+                                    JSONObject prod = (JSONObject) products.get(j);
 
                                     Product new_prod = new Product(
                                             prod.getString("SKU"),
@@ -87,6 +87,8 @@ public class ShoppingHistory {
                                 }
 
                                 productsInfo.put(cartNumber, newProducts);
+
+                                ((ShoppingHistoryActivity) context).expandableListViewAdapter.notifyDataSetChanged();
                             }
 
                         } catch (JSONException e) {

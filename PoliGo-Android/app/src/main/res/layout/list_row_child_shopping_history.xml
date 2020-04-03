@@ -6,12 +6,10 @@
     android:backgroundTint="@color/theWhite"
     android:layout_height="wrap_content">
 
-    <GridLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnCount="3"
-        android:orientation="horizontal"
-        android:rowCount="2">
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/iv_image_element"
@@ -20,30 +18,28 @@
             android:layout_column="0"
             android:maxHeight="@android:dimen/app_icon_size"
             android:maxWidth="@android:dimen/app_icon_size"
-            android:layout_columnWeight="0.10"
+            android:layout_columnWeight="0.01"
             android:src="@drawable/lab5_car_icon" />
 
         <TextView
             android:id="@+id/tv_name_element"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_column="1"
-            android:layout_columnWeight="0.35"
+            android:layout_weight="0.30"
             android:fontFamily="sans-serif-black"
-            android:layout_gravity="center_vertical"
             android:text="Heets Bronze"
             android:ems="6"
-            android:textAlignment="center"
-            android:textSize="17sp" />
+            android:gravity="start|center_vertical"
+            android:layout_marginStart="10dp"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tv_price_element"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_columnWeight="0.25"
+            android:layout_weight="0.10"
             android:layout_gravity="center"
-            android:layout_column="1"
-            android:layout_row="1"
+            android:gravity="start|center_vertical"
             android:text="17 RON" />
 
 
@@ -52,16 +48,31 @@
             android:layout_width="28dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="center"
+            android:gravity="start|center_vertical"
+            android:layout_weight="0.05"
             android:backgroundTint="@color/theWhite"
             android:text="1"
             android:inputType="number"
             android:textStyle="bold"
-            android:textSize="13sp" />
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tv_subtotal"
+            android:layout_width="28dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_weight="0.15"
+            android:backgroundTint="@color/theWhite"
+            android:text="230 RON"
+            android:inputType="number"
+            android:textStyle="bold"
+            android:textSize="15sp" />
 
 
 
-    </GridLayout>
+
+    </LinearLayout>
 
 
 </LinearLayout>

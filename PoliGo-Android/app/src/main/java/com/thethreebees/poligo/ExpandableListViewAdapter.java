@@ -49,8 +49,6 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
         final Product product = child.first;
         final Integer quantity = child.second;
 
-        android.os.Debug.waitForDebugger();
-
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.list_row_child_shopping_history, null);
@@ -60,10 +58,13 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
         productNameView.setText(product.getName());
 
         TextView productPriceView = convertView.findViewById(R.id.tv_price_element);
-        productPriceView.setText(product.getPrice().toString());
+        productPriceView.setText(product.getPrice().toString() + " RON");
 
         TextView productQuantView = convertView.findViewById(R.id.tv_quantity);
         productQuantView.setText(quantity.toString());
+
+        TextView productSubtotal = convertView.findViewById(R.id.tv_subtotal);
+        productSubtotal.setText(((Double)(quantity * product.getPrice())).toString() + " RON");
 
         ImageView productImage = convertView.findViewById(R.id.iv_image_element);
         productImage.setImageResource(product.getImageResource());
@@ -102,14 +103,13 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
         }
 
         TextView cartNumberView = convertView.findViewById(R.id.cart_number);
-        cartNumberView.setTypeface(null, Typeface.BOLD);
         cartNumberView.setText("#" + header.get("number"));
 
         TextView cartDateView = convertView.findViewById(R.id.cart_date);
         cartDateView.setText(header.get("date"));
 
         TextView cartTotalSumView = convertView.findViewById(R.id.cart_sum);
-        cartTotalSumView.setText(header.get("totalSum"));
+        cartTotalSumView.setText(header.get("totalSum") + " RON");
 
         return convertView;
     }

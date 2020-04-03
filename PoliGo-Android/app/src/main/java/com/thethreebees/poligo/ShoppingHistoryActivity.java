@@ -24,7 +24,7 @@ import java.util.List;
 public class ShoppingHistoryActivity extends Activity {
 
     private ExpandableListView expandableListView;
-    private ExpandableListViewAdapter expandableListViewAdapter;
+    public ExpandableListViewAdapter expandableListViewAdapter;
     ShoppingHistory shoppingHistory;
 
     ArrayList<HashMap<String, String>> cartInfo;
@@ -43,7 +43,7 @@ public class ShoppingHistoryActivity extends Activity {
         cartInfo = new ArrayList<>();
         productsInfo = new HashMap<>();
 
-        expandableListViewAdapter = new ExpandableListViewAdapter(this, cartInfo, productsInfo);
+        expandableListViewAdapter = new ExpandableListViewAdapter(this, shoppingHistory.cartInfo, shoppingHistory.productsInfo);
         expandableListView.setAdapter(expandableListViewAdapter);
 
         addCartsToView();
@@ -80,10 +80,6 @@ public class ShoppingHistoryActivity extends Activity {
 
     private void addCartsToView() {
         shoppingHistory.fetchServerData();
-
-        cartInfo = (ArrayList<HashMap<String, String>>) shoppingHistory.cartInfo.clone();
-        productsInfo = (HashMap<String, ArrayList<Pair<Product, Integer>>>) shoppingHistory.productsInfo.clone();
-
         expandableListViewAdapter.notifyDataSetChanged();
     }
 
