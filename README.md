@@ -37,11 +37,9 @@
  ``` bash
  python3 manage.py makemigrations api store
  python3 manage.py migrate
- python3 runserver 0.0.0.0:8000
+ python3 manage.py runserver 0.0.0.0:8000
  ```
 
-
- 
  ###### In general, server-ul poate sa fie lasat sa mearga. Isi va da reload la fiecare ctrl+S pe un fisier dintr-un app.
  
  
@@ -50,6 +48,8 @@
  ###### Dupa ce ati scris o parte din functionalitatea endpoint-ului, e normal sa-l si testati. Dar cum?
  
  ```python
+# Ori in consola interactiva scriind 'python3' in terminal ori intr-un fisier pe care il rulati separat 
+ 
 import requests
  
 params = {'parametru_1': 12345,
@@ -110,6 +110,10 @@ def your_endpoint_view(request):
  > ##### Target compatibility -> 1.8
  > ##### OK
  
+ 
+ ##### Intrati pe telefon -> Setari -> About Phone -> Cautati pe unde scrie 'Build Number' -> Apasati de 7 (cred) ori pe Build Number
+ ##### Acum pe undeva prin setari (ori pur si simplu in meniu or pe la System) ar trebui sa apara `Developer Options`
+ ##### Intrati acolo si enablati optiunile de developer (daca e nevoie) si `USB debugging` din lista
  
  ##### Conectati telefon prin cablu la PC (dati accept-uri pe telefon)
  ##### Click pe triunghiul verde de langa numele device-uri
