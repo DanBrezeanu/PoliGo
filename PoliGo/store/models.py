@@ -38,4 +38,11 @@ class ShoppingCart(models.Model):
     shoppingHistory = models.ForeignKey(ShoppingHistory, on_delete=models.CASCADE, blank=True, null=True)
 
 
-
+class BankCard(models.Model):
+    cardNumber = models.CharField(primary_key = True, max_length=20, null=False, verbose_name='cardNumber')
+    cardHolder = models.CharField(max_length=255, null=False)
+    cardMonthExpire = models.CharField(null=False, max_length=2)
+    cardYearExpire = models.CharField(null=False, max_length=2)
+    cardCVV = models.CharField(null=False, max_length=3)
+    cardCompany = models.CharField(max_length=30, null=False)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)

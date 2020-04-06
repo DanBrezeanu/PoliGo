@@ -46,26 +46,12 @@ def check_stock(request):
     return json.dumps({'products': [ProductSerializer(query).data for query in queried_products]})
 
 
-def add_stock(request):
-    post_options = dict(request.POST)
-    products = []
-
-    # TODO: create separate message errors for each product/field
-    #       return message or smth (not None/True)
-    
+def add_stock(params):
+    req_products = params['products']
     try:
-        n = int(post_options['n'][0])
-
-
-        for idx in range(n):
-            item_name = 'product{}'.format(idx)
-            products.append(json.loads(post_options[item_name][0]))
-
-        for prod in products:
+        for prod in req_products:
             ProductDeserializer.deserialize(**prod).save()
     except:
         return None
 
     return True
-
-

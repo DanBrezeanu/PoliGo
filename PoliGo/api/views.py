@@ -3,16 +3,16 @@ from django.core.exceptions import PermissionDenied
 
 from django.contrib.auth.models import User
 
-from api.serializers import UserSerializer, ProductSerializer
+from api.serializers import UserSerializer, ProductSerializer, BankCardDeserializer, BankCardSerializer
 from api.http_codes import Error403, Error422, Error503, OK200
 
-from store.models import Product, Profile
+from store.models import Product, Profile, BankCard
 from api import db_utils
 import json
 import store
 import functools
 
-def key_to_user(request):
+def key_to_user(req_json):
     """
     Returns Profile associated to the api_key provided in request.
 
@@ -25,7 +25,7 @@ def key_to_user(request):
     
     # Get API-KEY from request
     try:    
-        api_key = request.GET['api_key'] if request.method == "GET" else request.POST['api_key'] 
+        api_key = req_json['api_key']
     except: # No API-KEY provided
         return None
 
@@ -34,6 +34,10 @@ def key_to_user(request):
         return Profile.objects.get(api_key = api_key)
     except store.models.Profile.DoesNotExist:
         return None
+        
+
+def json_from_request(request):
+    return json.loads(request.body.decode('utf-8'))
 
 def is_staff(func):
     """
@@ -74,8 +78,6 @@ def check_stock(request):
     :rtype: HttpResponse
     """
 
-    # dir(request)
-
     # Get the queried products
     if request.method == 'GET':
         products_json = db_utils.check_stock(request)
@@ -84,10 +86,10 @@ def check_stock(request):
 
     return HttpResponse(OK200(products_json))
 
-@is_staff
+# @is_staff
 def add_stock(request):
     if request.method == 'POST':
-        result = db_utils.add_stock(request)
+        result = db_utils.add_stock(json_from_request(request))
 
         if result is None:
             return HttpResponse(Error422('Wrong data'))
@@ -100,7 +102,7 @@ def add_stock(request):
 # @is_staff
 def remove_stock(request):
     if request.method == 'POST':
-        result = db_utils.remove_stock(request)
+        result = db_utils.remove_stock(json_from_request(request))
 
         if result is None:
             return HttpResponse(Error422('Wrong data'))
@@ -115,27 +117,51 @@ def login(request):
     return HttpResponse(json.dumps({'api_key': fake_api_key}))
 
 def register(request):
-    fake_api_key = '0xCAFEBABE0xDEADBEEF'
+    json_req = json_from_request(request)
+    
+    if request.method == 'POST':
+        try:
+            new_user = User.objects.create_user(
+                        email=json_req['email'],
+                        username=json_req['username'],
+                        password=json_req['password']
+                    )
+
+            new_user.save()
+        except django.db.utils.IntegrityError:
+            return HttpResponse(Error401('Username already exists'))
+
+
+        user_profile = Profile(user=new_user)
+        user_profile.save()
+
+        return HttpResponse(OK200(json.dumps({
+            'api_key': user_profile.api_key,
+            'name': user_profile.user.username,
+            'email': user_profile.user.email,
+        })))
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
+
+def add_card(request):
+    json_req = json_from_request(request)
+
+    print(json_req)
+
+    card_details = json_req['card_details']
+    user = key_to_user(json_req)
+
+    print("user {}".format(user))
+
+    new_card = BankCardDeserializer.deserialize(**card_details, user=user)
+    new_card.save()
+
+    cards = [BankCardSerializer(card).data for card in BankCard.objects.filter(profile=user)]
 
     if request.method == 'POST':
-        return HttpResponse(json.dumps(
-            {'api_key': fake_api_key,
-             'cards': [{'card_number': '5123678912341234',
-                        'card_holder': 'John Doe',
-                        'card_expiry_month': '12',
-                        'card_expiry_year': '24',
-                        'card_cvv': '123',
-                        'card_company': 'mastercard'},
-
-                       {'card_number': '4123678912341234',
-                        'card_holder': 'John Doe',
-                        'card_expiry_month': '12',
-                        'card_expiry_year': '21',
-                        'card_cvv': '345',
-                        'card_company': 'visa'},
-                      ]
-            }
-        ))
+        return HttpResponse(OK200(json.dumps({'cards': cards})))
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
 
 def shopping_history(request):
     if request.method == 'GET':

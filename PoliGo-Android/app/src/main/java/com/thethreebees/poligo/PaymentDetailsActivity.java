@@ -38,7 +38,6 @@ import java.util.Map;
 public class PaymentDetailsActivity extends Activity {
 
     Context context;
-    private String username, password, email;
     ProgressBar progressBar;
 
     EditText cardDateMonth;
@@ -48,6 +47,7 @@ public class PaymentDetailsActivity extends Activity {
     EditText cardHolder;
     ImageView cardCompany;
     Button buttonRegiser;
+    User loggedUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +62,9 @@ public class PaymentDetailsActivity extends Activity {
         cardCompany = findViewById(R.id.card_company);
 
         context = this;
-        Intent parentIntent = getIntent();
-
-        username = parentIntent.getStringExtra("username");
-        password = parentIntent.getStringExtra("password");
-        email = parentIntent.getStringExtra("email");
 
         progressBar = findViewById(R.id.progressBar);
+        loggedUser = SharedPrefManager.getInstance(this).getUser();
 
         mangeInputContext();
     }
@@ -193,7 +189,6 @@ public class PaymentDetailsActivity extends Activity {
             public void afterTextChanged(Editable editable) {}
         });
 
-
         cardCVV.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus)
@@ -211,23 +206,21 @@ public class PaymentDetailsActivity extends Activity {
         JSONObject params = new JSONObject();
 
         try {
-            cardDetails.put("card_number", cardNumber.getText().toString());
-            cardDetails.put("card_holder", cardHolder.getText().toString());
-            cardDetails.put("card_month", cardDateMonth.getText().toString());
-            cardDetails.put("card_year", cardDateYear.getText().toString());
-            cardDetails.put("card_cvv", cardCVV.getText().toString());
-            cardDetails.put("card_company", (cardNumber.getText().toString().charAt(0) == '4') ? "visa" : "mastercard");
+            params.put("api_key", loggedUser.getId());
+            cardDetails.put("cardNumber", cardNumber.getText().toString());
+            cardDetails.put("cardHolder", cardHolder.getText().toString());
+            cardDetails.put("cardMonthExpire", cardDateMonth.getText().toString());
+            cardDetails.put("cardYearExpire", cardDateYear.getText().toString());
+            cardDetails.put("cardCVV", cardCVV.getText().toString());
+            cardDetails.put("cardCompany", (cardNumber.getText().toString().charAt(0) == '4') ? "visa" : "mastercard");
 
 
-            params.put("username", username);
-            params.put("password", password);
-            params.put("email", email);
             params.put("card_details", cardDetails);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        JsonObjectRequest jsonRequest= new JsonObjectRequest(Request.Method.POST, URLs.URL_REGISTER, params,
+        JsonObjectRequest jsonRequest= new JsonObjectRequest(Request.Method.POST, URLs.URL_ADD_CARD, params,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -236,16 +229,6 @@ public class PaymentDetailsActivity extends Activity {
                         try {
                             JSONObject obj = response;
 
-                            Toast.makeText(getApplicationContext(), obj.getString("api_key"), Toast.LENGTH_SHORT).show();
-
-                            //TODO: get actual data from server, including card numbers
-                            User user = new User(
-                                    obj.getString("api_key"),
-                                    obj.getString("api_key"),
-                                    obj.getString("api_key"),
-                                    null
-                            );
-
                             ArrayList<BankCard> bankCards = new ArrayList<>();
                             JSONArray responseBankCards = obj.getJSONArray("cards");
 
@@ -253,19 +236,17 @@ public class PaymentDetailsActivity extends Activity {
                                 JSONObject card = (JSONObject) responseBankCards.get(i);
 
                                 bankCards.add(new BankCard(
-                                        card.getString("card_number"),
-                                        card.getString("card_holder"),
-                                        card.getString("card_expiry_month"),
-                                        card.getString("card_expiry_year"),
-                                        card.getString("card_cvv"),
-                                        card.getString("card_company")
+                                        card.getString("cardNumber"),
+                                        card.getString("cardHolder"),
+                                        card.getString("cardMonthExpire"),
+                                        card.getString("cardYearExpire"),
+                                        card.getString("cardCVV"),
+                                        card.getString("cardCompany")
                                 ));
                             }
 
-                            user.setCards(bankCards);
-
-                            //storing the user in shared preferences
-                            SharedPrefManager.getInstance(getApplicationContext()).userLogin(user);
+                            loggedUser.setCards(bankCards);
+                            SharedPrefManager.getInstance(context).userLogin(loggedUser);
 
                             //starting the profile activity
                             finish();
@@ -280,16 +261,7 @@ public class PaymentDetailsActivity extends Activity {
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("username", username);
-                params.put("email", email);
-                params.put("password", password);
-                return params;
-            }
-        };
+                });
 
         progressBar.setVisibility(View.VISIBLE);
         VolleySingleton.getInstance(this).addToRequestQueue(jsonRequest);

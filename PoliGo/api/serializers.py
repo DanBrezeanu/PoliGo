@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from store.models import Profile, Product
+from store.models import Profile, Product, BankCard
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,6 +12,11 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['SKU', 'name', 'price', 'stock']
 
+class BankCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BankCard
+        fields = ['cardNumber', 'cardHolder', 'cardMonthExpire', 'cardYearExpire', 'cardCVV', 'cardCompany']
+
 class ProductDeserializer:
     @staticmethod
     def deserialize(**kwargs):
@@ -20,4 +25,17 @@ class ProductDeserializer:
             name = kwargs['name'],
             price = kwargs['price'],
             stock = kwargs['stock']
+        )
+
+class BankCardDeserializer:
+    @staticmethod
+    def deserialize(**kwargs):
+        return BankCard(
+            cardNumber = kwargs['cardNumber'],
+            cardHolder = kwargs['cardHolder'],
+            cardMonthExpire = kwargs['cardMonthExpire'],
+            cardYearExpire = kwargs['cardYearExpire'],
+            cardCVV = kwargs['cardCVV'],
+            cardCompany = kwargs['cardCompany'],
+            profile = kwargs['user']
         )

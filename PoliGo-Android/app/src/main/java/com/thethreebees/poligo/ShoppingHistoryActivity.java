@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.app.ExpandableListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -81,6 +82,12 @@ public class ShoppingHistoryActivity extends Activity {
     private void addCartsToView() {
         shoppingHistory.fetchServerData();
         expandableListViewAdapter.notifyDataSetChanged();
+    }
+
+    public void onBackPressed() {
+        Intent backToMain = new Intent(ShoppingHistoryActivity.this, MainActivity.class);
+        startActivity(backToMain);
+        finish();
     }
 
 }

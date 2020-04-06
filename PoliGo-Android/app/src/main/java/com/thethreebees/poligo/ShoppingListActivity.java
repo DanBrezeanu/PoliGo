@@ -162,4 +162,10 @@ public class ShoppingListActivity extends Activity {
         checkoutIntent.putExtra("totalSum", totalSum.getText().toString());
         startActivity(checkoutIntent);
     }
+
+    public void onBackPressed() {
+        Intent backToMain = new Intent(ShoppingListActivity.this, MainActivity.class);
+        startActivity(backToMain);
+        finish();
+    }
 }
