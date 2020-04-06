@@ -37,12 +37,47 @@
  ``` bash
  python3 manage.py makemigrations api store
  python3 manage.py migrate
- python3 runserver 0.0.0.0:8000
+ python3 manage.py runserver 0.0.0.0:8000
  ```
 
-
- 
  ###### In general, server-ul poate sa fie lasat sa mearga. Isi va da reload la fiecare ctrl+S pe un fisier dintr-un app.
+ 
+ 
+ ### Testare endpoint-uri
+ 
+ ###### Dupa ce ati scris o parte din functionalitatea endpoint-ului, e normal sa-l si testati. Dar cum?
+ 
+ ```python
+# Ori in consola interactiva scriind 'python3' in terminal ori intr-un fisier pe care il rulati separat 
+ 
+import requests
+ 
+params = {'parametru_1': 12345,
+          'parametru_2': 'un_string_frumi',
+          'parametru_3': ['el_lista_1' 'el_lista_2']}
+          
+# GET Request
+r = requests.get(url='http://127.0.0.1:8000/api/v1/<URL_ENDPOINT>', json=params)
+
+# POST request
+r = requests.post(url='http://127.0.0.1:8000/api/v1/<URL_ENDPOINT>', json=params)
+
+
+print(r.text) # raspunsul de server
+```
+
+###### Si cum il preluati json-ul in Django?
+
+```python
+def your_endpoint_view(request):
+    if request.method == 'POST':
+        params = json.loads(request.body.decode('utf-8')))
+    else request.method == 'GET':
+        params = json.loads(request.body.decode('utf-8')))
+        
+    # Acum params e un dictionar cu ce ati trimis
+    # Nu uitati sa puneti si 'api_key' printre campuri mereu
+``` 
  
  
  ### Android app
@@ -75,6 +110,10 @@
  > ##### Target compatibility -> 1.8
  > ##### OK
  
+ 
+ ##### Intrati pe telefon -> Setari -> About Phone -> Cautati pe unde scrie 'Build Number' -> Apasati de 7 (cred) ori pe Build Number
+ ##### Acum pe undeva prin setari (ori pur si simplu in meniu or pe la System) ar trebui sa apara `Developer Options`
+ ##### Intrati acolo si enablati optiunile de developer (daca e nevoie) si `USB debugging` din lista
  
  ##### Conectati telefon prin cablu la PC (dati accept-uri pe telefon)
  ##### Click pe triunghiul verde de langa numele device-uri
