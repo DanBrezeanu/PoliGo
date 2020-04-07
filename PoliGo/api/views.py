@@ -99,6 +99,26 @@ def add_stock(request):
     else:
         return HttpResponse(Error503('Only POST requests accepted'))
 
+def add_to_cart(request):
+    if request.method == 'POST':
+        json_req = json_from_request(request)
+        if json_req['SKU'] is None:
+            return HttpResponse(Error422('Wrong data'))
+
+        product = Product.objects.filter(SKU=json_req['SKU'])[0]
+        result = db_utils.add_to_cart(json_req)
+
+        if result is None:
+            return HttpResponse(Error422('Failed add to cart'))
+        else:
+            return HttpResponse(OK200(json.dumps({
+                'SKU' : product.SKU,
+                'name' : product.name,
+                'price' : product.price,
+                'stock' : product.stock
+                })))
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
 
 # @is_staff
 def remove_stock(request):

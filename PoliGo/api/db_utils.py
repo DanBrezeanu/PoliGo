@@ -1,6 +1,7 @@
 from api.serializers import ProductSerializer, ProductDeserializer
 from api.http_codes import Error422
-from store.models import Product
+from api import views
+from store.models import Product, ShoppingCart
 import json
 
 import store
@@ -31,7 +32,7 @@ def check_stock(request):
         # Find products with the requested names
         if 'name' in get_options:
             queried_products.update([item for name in get_options['name'] for item in Product.objects.filter(name = name)])
-        
+
         # Find products with the requested categories
         if 'category' in get_options:
             queried_products.update([item for category in get_options['category'] for item in Product.objects.filter(category = category)])
@@ -54,4 +55,18 @@ def add_stock(params):
     except:
         return None
 
+    return True
+
+def add_to_cart(params):
+    product = Product.objects.filter(SKU=params['SKU'])[0]
+    quantity = params['quantity']
+    profile = views.key_to_user(params)
+    shopping_cart = ShoppingCart.objects.filter(customer=profile)[0]
+
+    try:
+        if shopping_cart.active:
+            for i in range(quantity):
+                shopping_cart.products.add(product)
+    except:
+        return None
     return True
