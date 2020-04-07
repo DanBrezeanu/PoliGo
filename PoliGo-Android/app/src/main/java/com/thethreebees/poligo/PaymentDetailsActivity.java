@@ -1,41 +1,26 @@
 package com.thethreebees.poligo;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.io.Serializable;
-import java.io.SerializablePermission;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class PaymentDetailsActivity extends Activity {
 
@@ -48,7 +33,6 @@ public class PaymentDetailsActivity extends Activity {
     EditText cardNumber;
     EditText cardHolder;
     ImageView cardCompany;
-    Button buttonRegiser;
     User loggedUser;
     Class nextActivity;
 
@@ -83,18 +67,15 @@ public class PaymentDetailsActivity extends Activity {
         patternList.add("^4[0-9]{6,}$");      // visa
         patternList.add("^5[1-5][0-9]{5,}$"); // mastercard
 
-        cardNumber.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                for (String p : patternList)
-                    if (cardNumber.getText().toString().replaceAll(" ", "").matches(p))
-                        return;
+        cardNumber.setOnFocusChangeListener((view, b) -> {
+            for (String p : patternList)
+                if (cardNumber.getText().toString().replaceAll(" ", "").matches(p))
+                    return;
 
-                    if (cardNumber.getText().length() > 0)
-                        cardNumber.setError("Invalid card number");
+                if (cardNumber.getText().length() > 0)
+                    cardNumber.setError("Invalid card number");
 
-                }
-        });
+            });
 
         cardNumber.addTextChangedListener(new TextWatcher() {
             @Override
@@ -194,11 +175,9 @@ public class PaymentDetailsActivity extends Activity {
             public void afterTextChanged(Editable editable) {}
         });
 
-        cardCVV.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus)
-                    cardCVV.setHint("");
-            }
+        cardCVV.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus)
+                cardCVV.setHint("");
         });
 
     }
@@ -226,49 +205,38 @@ public class PaymentDetailsActivity extends Activity {
         }
 
         JsonObjectRequest jsonRequest= new JsonObjectRequest(Request.Method.POST, URLs.URL_ADD_CARD, params,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        progressBar.setVisibility(View.GONE);
+                response -> {
+                    progressBar.setVisibility(View.GONE);
 
-                        try {
-                            JSONObject obj = response;
+                    try {
+                        ArrayList<BankCard> bankCards = new ArrayList<>();
+                        JSONArray responseBankCards = response.getJSONArray("cards");
 
-                            ArrayList<BankCard> bankCards = new ArrayList<>();
-                            JSONArray responseBankCards = obj.getJSONArray("cards");
+                        for (int i = 0; i < responseBankCards.length(); ++i) {
+                            JSONObject card = (JSONObject) responseBankCards.get(i);
 
-                            for (int i = 0; i < responseBankCards.length(); ++i) {
-                                JSONObject card = (JSONObject) responseBankCards.get(i);
-
-                                bankCards.add(new BankCard(
-                                        card.getString("cardNumber"),
-                                        card.getString("cardHolder"),
-                                        card.getString("cardMonthExpire"),
-                                        card.getString("cardYearExpire"),
-                                        card.getString("cardCVV"),
-                                        card.getString("cardCompany")
-                                ));
-                            }
-
-                            loggedUser.setCards(bankCards);
-                            SharedPrefManager.getInstance(context).userLogin(loggedUser);
-
-                            //starting the profile activity
-                            finish();
-
-                            startActivity(new Intent(getApplicationContext(), nextActivity));
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            bankCards.add(new BankCard(
+                                    card.getString("cardNumber"),
+                                    card.getString("cardHolder"),
+                                    card.getString("cardMonthExpire"),
+                                    card.getString("cardYearExpire"),
+                                    card.getString("cardCVV"),
+                                    card.getString("cardCompany")
+                            ));
                         }
+
+                        loggedUser.setCards(bankCards);
+                        SharedPrefManager.getInstance(context).userLogin(loggedUser);
+
+
+                        finish();
+                        startActivity(new Intent(getApplicationContext(), nextActivity));
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                error -> Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show());
 
         progressBar.setVisibility(View.VISIBLE);
         VolleySingleton.getInstance(this).addToRequestQueue(jsonRequest);

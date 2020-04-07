@@ -8,15 +8,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class CardItemAdapter extends BaseAdapter {
     Context context;
     int[] cardCompany;
     String[] cardNumbers;
     LayoutInflater inflater;
-
-    static final int ADD_NEW_CARD = 5;
 
     public CardItemAdapter(Context applicationContext, int[] cardCompany, String[] cardNumbers) {
         this.context = applicationContext;
@@ -49,15 +46,12 @@ public class CardItemAdapter extends BaseAdapter {
         names.setText(cardNumbers[i]);
 
         if (cardNumbers[i].equals("Add new card")) {
-            icon.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent toPaymentOptions = new Intent(context, PaymentDetailsActivity.class);
-                    toPaymentOptions.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    toPaymentOptions.putExtra("nextActivity", CheckoutActivity.class);
-                    ((CheckoutActivity)context).startActivity(toPaymentOptions);
-                    ((CheckoutActivity)context).finish();
-                }
+            icon.setOnClickListener(view1 -> {
+                Intent toPaymentOptions = new Intent(context, PaymentDetailsActivity.class);
+                toPaymentOptions.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                toPaymentOptions.putExtra("nextActivity", CheckoutActivity.class);
+                ((CheckoutActivity)context).startActivity(toPaymentOptions);
+                ((CheckoutActivity)context).finish();
             });
         }
 

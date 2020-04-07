@@ -1,26 +1,15 @@
 package com.thethreebees.poligo;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
-import android.app.ExpandableListActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Pair;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.CheckedTextView;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class ShoppingHistoryActivity extends Activity {
 
@@ -54,28 +43,13 @@ public class ShoppingHistoryActivity extends Activity {
     private void setClickListeners() {
 
         // ExpandableListView on child click listener
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Toast.makeText(ShoppingHistoryActivity.this, "ok", Toast.LENGTH_SHORT).show();
-                return false;
-            }
+        expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
+            Toast.makeText(ShoppingHistoryActivity.this, "ok", Toast.LENGTH_SHORT).show();
+            return false;
         });
 
-        // ExpandableListView Group expanded listener
-        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-
-            @Override
-            public void onGroupExpand(int groupPosition) { }
-        });
-
-        // ExpandableListView Group collapsed listener
-        expandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-
-            @Override
-            public void onGroupCollapse(int groupPosition) { }
-        });
+        expandableListView.setOnGroupExpandListener(groupPosition -> { });
+        expandableListView.setOnGroupCollapseListener(groupPosition -> { });
 
     }
 

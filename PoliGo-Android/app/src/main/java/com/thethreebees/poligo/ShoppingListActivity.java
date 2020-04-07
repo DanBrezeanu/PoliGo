@@ -1,28 +1,22 @@
 package com.thethreebees.poligo;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
 import android.util.Log;
-import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
@@ -62,6 +56,7 @@ public class ShoppingListActivity extends Activity {
         resumeShopping();
     }
 
+    @SuppressLint("SetTextI18n")
     public void resumeShopping() {
         cart = sharedPref.getShoppingCart();
         System.out.println(cart.getCount());
@@ -102,57 +97,44 @@ public class ShoppingListActivity extends Activity {
                 Log.d("URL", URL);
 
                 JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, new JSONObject(),
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                progressBar.setVisibility(View.GONE);
+                        response -> {
+                            progressBar.setVisibility(View.GONE);
 
-                                try {
-                                    if (response.getInt("code") == 200 && response.getJSONArray("products").length() > 0) {
-                                        JSONObject prod = (JSONObject) response.getJSONArray("products").get(0);
+                            try {
+                                if (response.getInt("code") == 200 && response.getJSONArray("products").length() > 0) {
+                                    JSONObject prod = (JSONObject) response.getJSONArray("products").get(0);
 
 
-                                        Product new_prod = new Product(
-                                                prod.getString("SKU"),
-                                                prod.getString("name"),
-                                                prod.getDouble("price"),
-                                                image
-                                        );
+                                    Product new_prod = new Product(
+                                            prod.getString("SKU"),
+                                            prod.getString("name"),
+                                            prod.getDouble("price"),
+                                            image
+                                    );
 
-                                        ((ShoppingListActivity) context).productAdapter.addProduct(new_prod, 1);
+                                    ((ShoppingListActivity) context).productAdapter.addProduct(new_prod, 1);
 
 
-                                    } else {
-                                        AlertDialog alertDialog = new AlertDialog.Builder((ShoppingListActivity)context )
-                                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                                .setMessage("This product does not exist")
-                                                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                        dialogInterface.dismiss();
-                                                    }
-                                                })
-                                                .show();
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                                } else {
+                                    AlertDialog alertDialog = new AlertDialog.Builder((ShoppingListActivity)context )
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .setMessage("This product does not exist")
+                                            .setNeutralButton("OK", (dialogInterface, i) -> dialogInterface.dismiss())
+                                            .show();
                                 }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
                         },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-
-                            }
+                        error -> {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                         });
 
             VolleySingleton.getInstance(this).addToRequestQueue(getRequest);
             progressBar.setVisibility(View.VISIBLE);
         }
             if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
             }
     }
 

@@ -44,23 +44,13 @@ public class LoginActivity extends Activity {
         String sourceString = registerText.getText().toString() + "<b>Sign Up</b>";
         registerText.setText(Html.fromHtml(sourceString));
 
-
-
         //calling the method userLogin() for login the user
-        findViewById(R.id.btnLogin).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                userLogin();
-            }
-        });
+        findViewById(R.id.btnLogin).setOnClickListener(view -> userLogin());
 
         //if user presses on textview not register calling RegisterActivity
-        findViewById(R.id.tvRegister).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
-            }
+        findViewById(R.id.tvRegister).setOnClickListener(view -> {
+            finish();
+            startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
         });
     }
 
@@ -68,6 +58,7 @@ public class LoginActivity extends Activity {
         //first getting the values
         final String username = etName.getText().toString();
         final String password = etPassword.getText().toString();
+
         //validating inputs
         if (TextUtils.isEmpty(username)) {
             etName.setError("Please enter your username");
@@ -83,50 +74,32 @@ public class LoginActivity extends Activity {
 
         //if everything is fine
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URLs.URL_LOGIN,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        progressBar.setVisibility(View.GONE);
+                response -> {
+                    progressBar.setVisibility(View.GONE);
 
-                        try {
-                            JSONObject obj = new JSONObject(response);
+                    try {
+                        JSONObject obj = new JSONObject(response);
 
-                            Toast.makeText(getApplicationContext(), obj.getString("api_key"), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), obj.getString("api_key"), Toast.LENGTH_SHORT).show();
 
-                            //TODO: get actual data from server, including card numbers
-                            User user = new User(
-                                    obj.getString("api_key"),
-                                    obj.getString("api_key"),
-                                    obj.getString("api_key"),
-                                    null
-                            );
+                        //TODO: get actual data from server, including card numbers
+                        User user = new User(
+                                obj.getString("api_key"),
+                                obj.getString("api_key"),
+                                obj.getString("api_key"),
+                                null
+                        );
 
-                            //storing the user in shared preferences
-                            SharedPrefManager.getInstance(getApplicationContext()).userLogin(user);
-                            //starting the profile activity
-                            finish();
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        //storing the user in shared preferences
+                        SharedPrefManager.getInstance(getApplicationContext()).userLogin(user);
+                        //starting the profile activity
+                        finish();
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-
-                    }
-                })
-        {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("username", username);
-                params.put("password", password);
-                return params;
-            }
-        };
+                error -> Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show());
 
         VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
         progressBar.setVisibility(View.VISIBLE);

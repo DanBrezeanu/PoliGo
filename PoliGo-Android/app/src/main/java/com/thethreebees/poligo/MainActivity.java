@@ -1,9 +1,7 @@
 package com.thethreebees.poligo;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -14,7 +12,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -26,7 +23,7 @@ import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     SharedPreferences settings;
-    TextView id,userName,userEmail,gender;
+    TextView id;
     Button btnLogout;
 
     protected DrawerLayout drawerLayout;
@@ -40,9 +37,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        SharedPrefManager.getInstance(this).clearShoppingCart();
 
         if(!SharedPrefManager.getInstance(this).isLoggedIn()){
             Intent  intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -70,40 +64,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         navigationView = (NavigationView)findViewById(R.id.nv);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                switch(id)
-                {
-                case R.id.account:
-                    Toast.makeText(MainActivity.this, "My Account",Toast.LENGTH_SHORT).show();
-                    break;
-                case R.id.history:
-                    Toast.makeText(MainActivity.this, "Settings",Toast.LENGTH_SHORT).show();
-                    Intent toShoppingHistory = new Intent(MainActivity.this, ShoppingHistoryActivity.class);
-                    startActivity(toShoppingHistory);
-                    finish();
-                    break;
-                case R.id.mycart:
-                    Intent toCart = new Intent(MainActivity.this, ShoppingListActivity.class);
-                    startActivity(toCart);
-                    finish();
-                    break;
-                default:
-                    return true;
-                }
-
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            switch(id)
+            {
+            case R.id.account:
+                Toast.makeText(MainActivity.this, "My Account",Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.history:
+                Toast.makeText(MainActivity.this, "Settings",Toast.LENGTH_SHORT).show();
+                Intent toShoppingHistory = new Intent(MainActivity.this, ShoppingHistoryActivity.class);
+                startActivity(toShoppingHistory);
+                finish();
+                break;
+            case R.id.mycart:
+                Intent toCart = new Intent(MainActivity.this, ShoppingListActivity.class);
+                startActivity(toCart);
+                finish();
+                break;
+            default:
                 return true;
             }
+
+            return true;
         });
 
         gestureDetector = new GestureDetector(this, new SwipeDrawerDetection());
-        gestureListener = new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
-            }
-        };
+        gestureListener = (v, event) -> gestureDetector.onTouchEvent(event);
 
         ConstraintLayout background = findViewById(R.id.background_layout);
         background.setOnClickListener(MainActivity.this);

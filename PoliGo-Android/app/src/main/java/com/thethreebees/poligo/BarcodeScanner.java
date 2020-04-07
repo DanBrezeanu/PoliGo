@@ -74,7 +74,7 @@ public class BarcodeScanner extends Activity implements ZXingScannerView.ResultH
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_CAMERA)
             if (grantResults.length > 0) {
                 boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
@@ -82,14 +82,8 @@ public class BarcodeScanner extends Activity implements ZXingScannerView.ResultH
                     Toast.makeText(getApplicationContext(), "Permission Denied, You cannot access and camera", Toast.LENGTH_LONG).show();
                         if (shouldShowRequestPermissionRationale(CAMERA)) {
                             showMessageOKCancel("You need to allow access to both the permissions",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            requestPermissions(new String[]{CAMERA},
-                                                    REQUEST_CAMERA);
-                                        }
-
-                                    });
+                                    (dialog, which) -> requestPermissions(new String[]{CAMERA},
+                                            REQUEST_CAMERA));
                         }
                 }
             }
