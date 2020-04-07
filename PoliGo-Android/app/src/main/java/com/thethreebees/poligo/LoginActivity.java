@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -15,11 +16,14 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +59,6 @@ public class LoginActivity extends Activity {
     }
 
     private void userLogin() {
-        //first getting the values
         final String username = etName.getText().toString();
         final String password = etPassword.getText().toString();
 
@@ -72,29 +75,54 @@ public class LoginActivity extends Activity {
             return;
         }
 
-        //if everything is fine
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URLs.URL_LOGIN,
+        JSONObject params = new JSONObject();
+
+        try {
+            params.put("username", username);
+            params.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, URLs.URL_LOGIN, params,
                 response -> {
                     progressBar.setVisibility(View.GONE);
 
                     try {
-                        JSONObject obj = new JSONObject(response);
+                        if (response.getInt("code") == 200) {
 
-                        Toast.makeText(getApplicationContext(), obj.getString("api_key"), Toast.LENGTH_SHORT).show();
+                            User user = new User(
+                                    response.getString("api_key"),
+                                    response.getString("name"),
+                                    response.getString("email"),
+                                    null
+                            );
 
-                        //TODO: get actual data from server, including card numbers
-                        User user = new User(
-                                obj.getString("api_key"),
-                                obj.getString("api_key"),
-                                obj.getString("api_key"),
-                                null
-                        );
+                            ArrayList<BankCard> bankCards = new ArrayList<>();
+                            JSONArray responseBankCards = response.getJSONArray("cards");
 
-                        //storing the user in shared preferences
-                        SharedPrefManager.getInstance(getApplicationContext()).userLogin(user);
-                        //starting the profile activity
-                        finish();
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            for (int i = 0; i < responseBankCards.length(); ++i) {
+                                JSONObject card = (JSONObject) responseBankCards.get(i);
+
+                                bankCards.add(new BankCard(
+                                        card.getString("cardNumber"),
+                                        card.getString("cardHolder"),
+                                        card.getString("cardMonthExpire"),
+                                        card.getString("cardYearExpire"),
+                                        card.getString("cardCVV"),
+                                        card.getString("cardCompany")
+                                ));
+                            }
+
+                            user.setCards(bankCards);
+
+                            SharedPrefManager.getInstance(getApplicationContext()).userLogin(user);
+                            finish();
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        } else {
+                            etPassword.setError("Invalid password or username");
+                            etPassword.requestFocus();
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -103,6 +131,7 @@ public class LoginActivity extends Activity {
 
         VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
         progressBar.setVisibility(View.VISIBLE);
+
 
     }
 

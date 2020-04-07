@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse
 from django.core.exceptions import PermissionDenied
 
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 
 from api.serializers import UserSerializer, ProductSerializer, BankCardDeserializer, BankCardSerializer
 from api.http_codes import Error403, Error422, Error503, OK200
@@ -112,9 +113,24 @@ def remove_stock(request):
         return HttpResponse(Error503('Only POST requests accepted'))
 
 def login(request):
-    fake_api_key = '0xCAFEBABE0xDEADBEEF'
+    if request.method == 'POST':
+        json_req = json_from_request(request)
+        user = authenticate(username=json_req['username'], password=json_req['password'])
 
-    return HttpResponse(json.dumps({'api_key': fake_api_key}))
+        if user is None:
+            return HttpResponse(Error403('Invalid credentials'))
+
+        profile = Profile.objects.filter(user=user)[0]
+        cards = [BankCardSerializer(card).data for card in BankCard.objects.filter(profile=profile)]
+
+        return HttpResponse(OK200(json.dumps({
+            'api_key': profile.api_key,
+            'name': profile.user.username,
+            'email': profile.user.email,
+            'cards': cards
+        })))
+    else:
+        return HttpResponse(Error503('Onlyt POST requests accepted'))
 
 def register(request):
     json_req = json_from_request(request)
@@ -145,13 +161,9 @@ def register(request):
 
 def add_card(request):
     json_req = json_from_request(request)
-
-    print(json_req)
-
-    card_details = json_req['card_details']
     user = key_to_user(json_req)
 
-    print("user {}".format(user))
+    card_details = json_req['card_details']
 
     new_card = BankCardDeserializer.deserialize(**card_details, user=user)
     new_card.save()
