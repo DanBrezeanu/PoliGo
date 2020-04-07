@@ -4,10 +4,10 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
-from api.serializers import UserSerializer, ProductSerializer, BankCardDeserializer, BankCardSerializer
+from api.serializers import BankCardDeserializer, BankCardSerializer, ProductSerializer, ShoppingCartSerializer, UserSerializer
 from api.http_codes import Error403, Error422, Error503, OK200
 
-from store.models import Product, Profile, BankCard
+from store.models import BankCard, Product, Profile, ShoppingCart, ShoppingHistory
 from api import db_utils
 import json
 import store
@@ -175,56 +175,6 @@ def add_card(request):
     else:
         return HttpResponse(Error503('Only POST requests accepted'))
 
-def shopping_history(request):
-    if request.method == 'GET':
-        return HttpResponse(json.dumps(
-            {'carts': [
-                {
-                    'number': 1,
-                    'date': '12/03/2020',
-                    'total_sum': 120.1,
-                    'products': 
-                    [
-                        {
-                            'SKU': '59474982',
-                            'name': 'Heets Bronze',
-                            'price': 17.0,
-                            'quantity': 2
-                        },
-                        {
-                            'SKU': '5948874114230',
-                            'name': 'Touch',
-                            'price': 20.0,
-                            'quantity': 3
-                        }
-                    ]
-                },
-                {
-                    'number': 2,
-                    'date': '13/03/2020',
-                    'total_sum': 230.1,
-                    'products': 
-                        [
-                        {
-                            'SKU': '59474982',
-                            'name': 'Heets Bronze',
-                            'price': 17.0,
-                            'quantity': 2
-                        },
-                        {
-                            'SKU': '5948874114230',
-                            'name': 'Touch',
-                            'price': 20.0,
-                            'quantity': 4
-                        }
-                        ]
-                    }
-                ]
-            }
-           
-        ))
-
-
 
 # def pretul_produsului(request):
 #     user = key_to_user(request)
@@ -238,6 +188,53 @@ def shopping_history(request):
 #     adaugati produsul -> shopping cart 
 
 # TODO:
+
+def place_order(request):
+    user = key_to_user(json_from_request(request))
+
+    if user is None:
+        return HttpResponse(Error422('No such user'))
+    
+    if request.method == 'POST':
+        try:
+            # get active shopping cart
+            shopping_cart = ShoppingCart.objects.filter(customer=user, active=True)[0]
+        except:
+            return HttpResponse(Error422('No active Shopping Cart'))
+
+        shopping_cart.active = False
+
+        if ShoppingHistory.objects.filter(customer=user) != []:
+            shopping_cart.shoppingHistory = ShoppingHistory.objects.filter(customer=user)[0]
+        else:
+            shopping_cart.shoppingHistory = ShoppingHistory(customer=user)
+
+        shopping_cart.shoppingHistory.save()
+        shopping_cart.save()
+        
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
+
+    return HttpResponse(OK200(json.dumps(ShoppingCartSerializer(shopping_cart).data)))
+
+def shopping_history(request):
+    user = key_to_user(json_from_request(request))
+
+    if user is None:
+        return HttpResponse(Error422('No such user'))
+
+    if request.method == 'GET':
+        try:
+            shopping_history = ShoppingHistory.objects.filter(customer=user)[0]
+        except:
+            return HttpResponse(Error422('No available Shopping History'))
+        shopping_carts = [ShoppingCartSerializer(cart).data for cart in ShoppingCart.objects.filter(shoppingHistory=shopping_history)]
+        ret_json = json.dumps({'carts': shopping_carts})
+    else:
+        return HttpResponse(Error503('Only GET requests accepted'))
+
+    return HttpResponse(OK200(ret_json))
+
 
 # ENDPOINT-URI PENTRU UTILIZATORI (fara @is_staff)
 # am scanat produsul -> POST REQ 
