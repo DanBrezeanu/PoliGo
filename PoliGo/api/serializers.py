@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from store.models import Profile, Product, BankCard
+from store.models import BankCard, Product, Profile, ShoppingCart
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
@@ -16,6 +16,11 @@ class BankCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = BankCard
         fields = ['cardNumber', 'cardHolder', 'cardMonthExpire', 'cardYearExpire', 'cardCVV', 'cardCompany']
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShoppingCart
+        fields = ['ID', 'totalCost', 'date', 'products']
 
 class ProductDeserializer:
     @staticmethod

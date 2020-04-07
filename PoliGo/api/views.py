@@ -3,10 +3,10 @@ from django.core.exceptions import PermissionDenied
 
 from django.contrib.auth.models import User
 
-from api.serializers import UserSerializer, ProductSerializer, BankCardDeserializer, BankCardSerializer
+from api.serializers import BankCardDeserializer, BankCardSerializer, ProductSerializer, ShoppingCartSerializer, UserSerializer
 from api.http_codes import Error403, Error422, Error503, OK200
 
-from store.models import Product, Profile, BankCard
+from store.models import BankCard, Product, Profile, ShoppingCart, ShoppingHistory
 from api import db_utils
 import json
 import store
@@ -226,6 +226,36 @@ def shopping_history(request):
 #     adaugati produsul -> shopping cart 
 
 # TODO:
+
+def place_order(request):
+    pass
+    # user = key_to_user(json_from_request(request))
+
+    # if user is None:
+    #     return HttpResponse(Error422('No such user'))
+    
+    # if request.method == 'POST':
+    #     pass
+    # else:
+    #     return HttpResponse(Error503('Only POST requests accepted'))
+
+    # return HttpResponse(OK200(ret_json))
+
+def get_shopping_history(request):
+    user = key_to_user(json_from_request(request))
+
+    if user is None:
+        return HttpResponse(Error422('No such user'))
+
+    if request.method == 'GET':
+        shopping_history = ShoppingHistory.objects.filter(customer=user)[0]
+        shopping_carts = [ShoppingCartSerializer(cart).data for cart in ShoppingCart.objects.filter(shoppingHistory=shopping_history)]
+        ret_json = json.dumps({'carts': shopping_carts})
+    else:
+        return HttpResponse(Error503('Only GET requests accepted'))
+
+    return HttpResponse(OK200(ret_json))
+
 
 # ENDPOINT-URI PENTRU UTILIZATORI (fara @is_staff)
 # am scanat produsul -> POST REQ 
