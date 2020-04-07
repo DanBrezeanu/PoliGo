@@ -1,5 +1,6 @@
 package com.thethreebees.poligo;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -48,6 +49,7 @@ public class ProductAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
+    @SuppressLint("SetTextI18n")
     public View getView(final int i, View view, ViewGroup viewGroup) {
         final View element;
 
@@ -66,49 +68,40 @@ public class ProductAdapter extends BaseAdapter {
 
         final Button remove = element.findViewById(R.id.tv_SKU_element);
         remove.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        int totalQuantity = Integer.parseInt(product.quantity.getText().toString());
+                view1 -> {
+                    int totalQuantity = Integer.parseInt(product.quantity.getText().toString());
 
-                        for (int j = 0; j < totalQuantity; ++j)
-                            removeProduct(products.get(i).first.getSKU());
+                    for (int j = 0; j < totalQuantity; ++j)
+                        removeProduct(products.get(i).first.getSKU());
 
-                        reloadElementsUI();
-                        ProductAdapter.this.notifyDataSetChanged();
-                    }
+                    reloadElementsUI();
+                    ProductAdapter.this.notifyDataSetChanged();
                 }
         );
 
         final ImageButton increment_quantity = element.findViewById(R.id.add_quantity);
         increment_quantity.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        addProduct(products.get(i).first, 1);
-                        product.quantity.setText(products.get(i).second.toString());
+                view12 -> {
+                    addProduct(products.get(i).first, 1);
+                    product.quantity.setText(products.get(i).second.toString());
 
-                        reloadElementsUI();
-                        ProductAdapter.this.notifyDataSetChanged();
-                    }
+                    reloadElementsUI();
+                    ProductAdapter.this.notifyDataSetChanged();
                 }
         );
 
         final ImageButton decrement_quantity = element.findViewById(R.id.remove_quantity);
         decrement_quantity.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        int initial_quant = products.get(i).second;
+                view13 -> {
+                    int initial_quant = products.get(i).second;
 
-                        removeProduct(products.get(i).first.getSKU());
+                    removeProduct(products.get(i).first.getSKU());
 
-                        if (initial_quant > 1)
-                            product.quantity.setText(products.get(i).second.toString());
+                    if (initial_quant > 1)
+                        product.quantity.setText(products.get(i).second.toString());
 
-                        reloadElementsUI();
-                        ProductAdapter.this.notifyDataSetChanged();
-                    }
+                    reloadElementsUI();
+                    ProductAdapter.this.notifyDataSetChanged();
                 }
         );
 
@@ -126,6 +119,7 @@ public class ProductAdapter extends BaseAdapter {
     }
 
 
+    @SuppressLint("SetTextI18n")
     void reloadElementsUI() {
         totalSumTextView.setText(cart.getTotalSum().toString());
 
@@ -199,6 +193,7 @@ class Product {
         this.imageResource = imageResource;
     }
 
+    @SuppressLint("DefaultLocale")
     @NonNull
     @Override
     public String toString() {

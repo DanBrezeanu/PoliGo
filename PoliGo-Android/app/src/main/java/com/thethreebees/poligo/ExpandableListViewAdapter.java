@@ -1,5 +1,6 @@
 package com.thethreebees.poligo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Pair;
@@ -42,6 +43,7 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
         return childPosition;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
@@ -92,6 +94,7 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
         return groupPosition;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 

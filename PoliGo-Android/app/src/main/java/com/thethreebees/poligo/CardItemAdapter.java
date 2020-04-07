@@ -1,6 +1,7 @@
 package com.thethreebees.poligo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +13,13 @@ public class CardItemAdapter extends BaseAdapter {
     Context context;
     int[] cardCompany;
     String[] cardNumbers;
-    LayoutInflater inflter;
+    LayoutInflater inflater;
 
     public CardItemAdapter(Context applicationContext, int[] cardCompany, String[] cardNumbers) {
         this.context = applicationContext;
         this.cardCompany = cardCompany;
         this.cardNumbers= cardNumbers;
-        inflter = (LayoutInflater.from(applicationContext));
+        inflater = (LayoutInflater.from(applicationContext));
     }
 
     @Override
@@ -38,11 +39,24 @@ public class CardItemAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        view = inflter.inflate(R.layout.card_spinner_items, null);
+        view = inflater.inflate(R.layout.card_spinner_items, null);
         ImageView icon = (ImageView) view.findViewById(R.id.imageView);
         TextView names = (TextView) view.findViewById(R.id.textView);
         icon.setImageResource(cardCompany[i]);
         names.setText(cardNumbers[i]);
+
+        if (cardNumbers[i].equals("Add new card")) {
+            icon.setOnClickListener(view1 -> {
+                Intent toPaymentOptions = new Intent(context, PaymentDetailsActivity.class);
+                toPaymentOptions.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                toPaymentOptions.putExtra("nextActivity", CheckoutActivity.class);
+                ((CheckoutActivity)context).startActivity(toPaymentOptions);
+                ((CheckoutActivity)context).finish();
+            });
+        }
+
         return view;
     }
+
+
 }

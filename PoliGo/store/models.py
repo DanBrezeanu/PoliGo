@@ -32,10 +32,18 @@ class ShoppingCart(models.Model):
     ID = models.AutoField(auto_created=True, primary_key=True, serialize=True, verbose_name='ID')
     totalCost = models.FloatField(default=0.0)
     active = models.BooleanField(default=True)
+    date = models.DateField(auto_now=True)
 
     products = models.ManyToManyField(Product)
     customer = models.ForeignKey(Profile, on_delete=models.CASCADE)
     shoppingHistory = models.ForeignKey(ShoppingHistory, on_delete=models.CASCADE, blank=True, null=True)
 
 
-
+class BankCard(models.Model):
+    cardNumber = models.CharField(primary_key = True, max_length=20, null=False, verbose_name='cardNumber')
+    cardHolder = models.CharField(max_length=255, null=False)
+    cardMonthExpire = models.CharField(null=False, max_length=2)
+    cardYearExpire = models.CharField(null=False, max_length=2)
+    cardCVV = models.CharField(null=False, max_length=3)
+    cardCompany = models.CharField(max_length=30, null=False)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)

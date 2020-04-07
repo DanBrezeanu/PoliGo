@@ -1,28 +1,15 @@
 package com.thethreebees.poligo;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-
 import java.util.ArrayList;
-
-import static java.lang.Thread.sleep;
 
 public class CheckoutActivity extends Activity implements AdapterView.OnItemSelectedListener{
 
@@ -43,19 +30,29 @@ public class CheckoutActivity extends Activity implements AdapterView.OnItemSele
 
         ArrayList<BankCard> userCards = SharedPrefManager.getInstance(this).getUser().getCards();
 
-        cardCompanies = new int[userCards.size()];
-        cardNumbers = new String[userCards.size()];
+        if (userCards != null) {
 
-        for (int i = 0; i < userCards.size(); ++i) {
-            String cardNumber = userCards.get(i).getNumber();
-            String cardCompany = userCards.get(i).getCompany();
+            cardCompanies = new int[userCards.size()];
+            cardNumbers = new String[userCards.size()];
 
-            cardNumbers[i] = "**** **** **** " + cardNumber.substring(cardNumber.length() - 4);
-            cardCompanies[i] = cardCompany.equals("visa") ? R.drawable.visa : R.drawable.mastercard;
+            for (int i = 0; i < userCards.size(); ++i) {
+                String cardNumber = userCards.get(i).getNumber();
+                String cardCompany = userCards.get(i).getCompany();
+
+                cardNumbers[i] = "**** **** **** " + cardNumber.substring(cardNumber.length() - 4);
+                cardCompanies[i] = cardCompany.equals("visa") ? R.drawable.visa : R.drawable.mastercard;
+            }
+
+        } else {
+            cardCompanies = new int[1];
+            cardNumbers = new String[1];
+
+            cardCompanies[0] = R.drawable.ic_add_circle_black_24dp;
+            cardNumbers[0] = "Add new card";
         }
 
-        CardItemAdapter customAdapter = new CardItemAdapter(getApplicationContext(),
-                                            cardCompanies, cardNumbers);
+        CardItemAdapter customAdapter = new CardItemAdapter(CheckoutActivity.this,
+                cardCompanies, cardNumbers);
         spin.setAdapter(customAdapter);
 
 

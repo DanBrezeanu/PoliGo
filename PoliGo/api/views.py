@@ -2,11 +2,12 @@ from django.shortcuts import render, HttpResponse
 from django.core.exceptions import PermissionDenied
 
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 
-from api.serializers import UserSerializer, ProductSerializer
+from api.serializers import BankCardDeserializer, BankCardSerializer, ProductSerializer, ShoppingCartSerializer, UserSerializer
 from api.http_codes import Error403, Error422, Error503, OK200
 
-from store.models import Product, Profile, ShoppingCart
+from store.models import BankCard, Product, Profile, ShoppingCart, ShoppingHistory
 from api import db_utils
 import json
 import store
@@ -32,6 +33,10 @@ def key_to_user(req_json):
         return Profile.objects.get(api_key = api_key)
     except store.models.Profile.DoesNotExist:
         return None
+        
+
+def json_from_request(request):
+    return json.loads(request.body.decode('utf-8'))
 
 def is_staff(func):
     """
@@ -72,8 +77,6 @@ def check_stock(request):
     :rtype: HttpResponse
     """
 
-    # dir(request)
-
     # Get the queried products
     if request.method == 'GET':
         products_json = db_utils.check_stock(request)
@@ -82,10 +85,10 @@ def check_stock(request):
 
     return HttpResponse(OK200(products_json))
 
-@is_staff
+# @is_staff
 def add_stock(request):
     if request.method == 'POST':
-        result = db_utils.add_stock(request)
+        result = db_utils.add_stock(json_from_request(request))
 
         if result is None:
             return HttpResponse(Error422('Wrong data'))
@@ -98,7 +101,7 @@ def add_stock(request):
 # @is_staff
 def remove_stock(request):
     if request.method == 'POST':
-        result = db_utils.remove_stock(request)
+        result = db_utils.remove_stock(json_from_request(request))
 
         if result is None:
             return HttpResponse(Error422('Wrong data'))
@@ -108,81 +111,67 @@ def remove_stock(request):
         return HttpResponse(Error503('Only POST requests accepted'))
 
 def login(request):
-    fake_api_key = '0xCAFEBABE0xDEADBEEF'
+    if request.method == 'POST':
+        json_req = json_from_request(request)
+        user = authenticate(username=json_req['username'], password=json_req['password'])
 
-    return HttpResponse(json.dumps({'api_key': fake_api_key}))
+        if user is None:
+            return HttpResponse(Error403('Invalid credentials'))
+
+        profile = Profile.objects.filter(user=user)[0]
+        cards = [BankCardSerializer(card).data for card in BankCard.objects.filter(profile=profile)]
+
+        return HttpResponse(OK200(json.dumps({
+            'api_key': profile.api_key,
+            'name': profile.user.username,
+            'email': profile.user.email,
+            'cards': cards
+        })))
+    else:
+        return HttpResponse(Error503('Onlyt POST requests accepted'))
 
 def register(request):
-    fake_api_key = '0xCAFEBABE0xDEADBEEF'
-
+    json_req = json_from_request(request)
+    
     if request.method == 'POST':
-        return HttpResponse(json.dumps(
-            {'api_key': fake_api_key,
-             'cards': [{'card_number': '5123678912341234',
-                        'card_holder': 'John Doe',
-                        'card_expiry_month': '12',
-                        'card_expiry_year': '24',
-                        'card_cvv': '123',
-                        'card_company': 'mastercard'},
+        try:
+            new_user = User.objects.create_user(
+                        email=json_req['email'],
+                        username=json_req['username'],
+                        password=json_req['password']
+                    )
 
-                       {'card_number': '4123678912341234',
-                        'card_holder': 'John Doe',
-                        'card_expiry_month': '12',
-                        'card_expiry_year': '21',
-                        'card_cvv': '345',
-                        'card_company': 'visa'},
-                      ]
-            }
-        ))
+            new_user.save()
+        except django.db.utils.IntegrityError:
+            return HttpResponse(Error401('Username already exists'))
 
-def shopping_history(request):
-    if request.method == 'GET':
-        return HttpResponse(json.dumps(
-            {'carts': [
-                {
-                    'number': 1,
-                    'date': '12/03/2020',
-                    'total_sum': 120.1,
-                    'products': 
-                    [
-                        {
-                            'SKU': '59474982',
-                            'name': 'Heets Bronze',
-                            'price': 17.0,
-                            'quantity': 2
-                        },
-                        {
-                            'SKU': '5948874114230',
-                            'name': 'Touch',
-                            'price': 20.0,
-                            'quantity': 3
-                        }
-                    ]
-                },
-                {
-                    'number': 2,
-                    'date': '13/03/2020',
-                    'total_sum': 230.1,
-                    'products': 
-                        [
-                        {
-                            'SKU': '59474982',
-                            'name': 'Heets Bronze',
-                            'price': 17.0,
-                            'quantity': 2
-                        },
-                        {
-                            'SKU': '5948874114230',
-                            'name': 'Touch',
-                            'price': 20.0,
-                            'quantity': 4
-                        }
-                        ]
-                    }
-                ]
-            }
-           
-        ))
+
+        user_profile = Profile(user=new_user)
+        user_profile.save()
+
+        return HttpResponse(OK200(json.dumps({
+            'api_key': user_profile.api_key,
+            'name': user_profile.user.username,
+            'email': user_profile.user.email,
+        })))
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
+
+def add_card(request):
+    json_req = json_from_request(request)
+    user = key_to_user(json_req)
+
+    card_details = json_req['card_details']
+
+    new_card = BankCardDeserializer.deserialize(**card_details, user=user)
+    new_card.save()
+    
+    cards = [BankCardSerializer(card).data for card in BankCard.objects.filter(profile=user)]
+    
+    if request.method == 'POST':
+        return HttpResponse(OK200(json.dumps({'cards': cards})))
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
 
 def shopping_cart(request):
     if request.method == 'GET':
@@ -194,7 +183,6 @@ def shopping_cart(request):
         for cart in get_carts:
             if cart.active:
                 return HttpResponse(json.dumps({'products': [ProductSerializer(query).data for query in cart.products.all()]}))
-
 
 def remove_from_cart(request):
     if request.method == 'POST':
@@ -218,7 +206,6 @@ def remove_from_cart(request):
                     return HttpResponse(Error422('Wrong data'))
         return HttpResponse(json.dumps({'products': [ProductSerializer(query).data for query in cart.products.all()]}))
 
-
 # def pretul_produsului(request):
 #     user = key_to_user(request)
 
@@ -231,6 +218,53 @@ def remove_from_cart(request):
 #     adaugati produsul -> shopping cart 
 
 # TODO:
+
+def place_order(request):
+    user = key_to_user(json_from_request(request))
+
+    if user is None:
+        return HttpResponse(Error422('No such user'))
+    
+    if request.method == 'POST':
+        try:
+            # get active shopping cart
+            shopping_cart = ShoppingCart.objects.filter(customer=user, active=True)[0]
+        except:
+            return HttpResponse(Error422('No active Shopping Cart'))
+
+        shopping_cart.active = False
+
+        if ShoppingHistory.objects.filter(customer=user) != []:
+            shopping_cart.shoppingHistory = ShoppingHistory.objects.filter(customer=user)[0]
+        else:
+            shopping_cart.shoppingHistory = ShoppingHistory(customer=user)
+
+        shopping_cart.shoppingHistory.save()
+        shopping_cart.save()
+        
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
+
+    return HttpResponse(OK200(json.dumps(ShoppingCartSerializer(shopping_cart).data)))
+
+def shopping_history(request):
+    user = key_to_user(json_from_request(request))
+
+    if user is None:
+        return HttpResponse(Error422('No such user'))
+
+    if request.method == 'GET':
+        try:
+            shopping_history = ShoppingHistory.objects.filter(customer=user)[0]
+        except:
+            return HttpResponse(Error422('No available Shopping History'))
+        shopping_carts = [ShoppingCartSerializer(cart).data for cart in ShoppingCart.objects.filter(shoppingHistory=shopping_history)]
+        ret_json = json.dumps({'carts': shopping_carts})
+    else:
+        return HttpResponse(Error503('Only GET requests accepted'))
+
+    return HttpResponse(OK200(ret_json))
+
 
 # ENDPOINT-URI PENTRU UTILIZATORI (fara @is_staff)
 # am scanat produsul -> POST REQ 

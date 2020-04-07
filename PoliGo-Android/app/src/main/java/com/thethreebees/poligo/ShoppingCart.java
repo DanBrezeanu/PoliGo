@@ -1,8 +1,6 @@
 package com.thethreebees.poligo;
 
-import android.util.Log;
 import android.util.Pair;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 

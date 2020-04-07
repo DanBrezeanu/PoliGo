@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -15,11 +16,14 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,30 +48,20 @@ public class LoginActivity extends Activity {
         String sourceString = registerText.getText().toString() + "<b>Sign Up</b>";
         registerText.setText(Html.fromHtml(sourceString));
 
-
-
         //calling the method userLogin() for login the user
-        findViewById(R.id.btnLogin).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                userLogin();
-            }
-        });
+        findViewById(R.id.btnLogin).setOnClickListener(view -> userLogin());
 
         //if user presses on textview not register calling RegisterActivity
-        findViewById(R.id.tvRegister).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
-            }
+        findViewById(R.id.tvRegister).setOnClickListener(view -> {
+            finish();
+            startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
         });
     }
 
     private void userLogin() {
-        //first getting the values
         final String username = etName.getText().toString();
         final String password = etPassword.getText().toString();
+
         //validating inputs
         if (TextUtils.isEmpty(username)) {
             etName.setError("Please enter your username");
@@ -81,55 +75,63 @@ public class LoginActivity extends Activity {
             return;
         }
 
-        //if everything is fine
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URLs.URL_LOGIN,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        progressBar.setVisibility(View.GONE);
+        JSONObject params = new JSONObject();
 
-                        try {
-                            JSONObject obj = new JSONObject(response);
+        try {
+            params.put("username", username);
+            params.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-                            Toast.makeText(getApplicationContext(), obj.getString("api_key"), Toast.LENGTH_SHORT).show();
+        JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, URLs.URL_LOGIN, params,
+                response -> {
+                    progressBar.setVisibility(View.GONE);
 
-                            //TODO: get actual data from server, including card numbers
+                    try {
+                        if (response.getInt("code") == 200) {
+
                             User user = new User(
-                                    obj.getString("api_key"),
-                                    obj.getString("api_key"),
-                                    obj.getString("api_key"),
+                                    response.getString("api_key"),
+                                    response.getString("name"),
+                                    response.getString("email"),
                                     null
                             );
 
-                            //storing the user in shared preferences
+                            ArrayList<BankCard> bankCards = new ArrayList<>();
+                            JSONArray responseBankCards = response.getJSONArray("cards");
+
+                            for (int i = 0; i < responseBankCards.length(); ++i) {
+                                JSONObject card = (JSONObject) responseBankCards.get(i);
+
+                                bankCards.add(new BankCard(
+                                        card.getString("cardNumber"),
+                                        card.getString("cardHolder"),
+                                        card.getString("cardMonthExpire"),
+                                        card.getString("cardYearExpire"),
+                                        card.getString("cardCVV"),
+                                        card.getString("cardCompany")
+                                ));
+                            }
+
+                            user.setCards(bankCards);
+
                             SharedPrefManager.getInstance(getApplicationContext()).userLogin(user);
-                            //starting the profile activity
                             finish();
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        } else {
+                            etPassword.setError("Invalid password or username");
+                            etPassword.requestFocus();
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-
-                    }
-                })
-        {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("username", username);
-                params.put("password", password);
-                return params;
-            }
-        };
+                error -> Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show());
 
         VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
         progressBar.setVisibility(View.VISIBLE);
+
 
     }
 

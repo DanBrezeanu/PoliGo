@@ -142,7 +142,7 @@
             android:layout_height="50dp"
             android:onClick="onRegisterUser"
             android:layout_gravity="center_horizontal"
-            android:text="Register" />
+            android:text="Add payment method" />
 
 
 
