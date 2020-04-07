@@ -16,10 +16,8 @@ import functools
 def key_to_user(req_json):
     """
     Returns Profile associated to the api_key provided in request.
-
     :param request: request from view function
     :type request: HttpRequest
-
     :returns: Profile with api_key equal to the one provided or None if not found
     :rtype: Profile/None
     """
@@ -167,14 +165,46 @@ def add_card(request):
 
     new_card = BankCardDeserializer.deserialize(**card_details, user=user)
     new_card.save()
-
+    
     cards = [BankCardSerializer(card).data for card in BankCard.objects.filter(profile=user)]
-
+    
     if request.method == 'POST':
         return HttpResponse(OK200(json.dumps({'cards': cards})))
     else:
         return HttpResponse(Error503('Only POST requests accepted'))
 
+def shopping_cart(request):
+    if request.method == 'GET':
+        req_json = json.loads(request.body.decode('utf-8'))
+        profiler = key_to_user(req_json)
+        if profiler is None:
+            return HttpResponse(Error422('Wrong data'))
+        get_carts = [item for item in ShoppingCart.objects.filter(customer__user=profiler.user)]
+        for cart in get_carts:
+            if cart.active:
+                return HttpResponse(json.dumps({'products': [ProductSerializer(query).data for query in cart.products.all()]}))
+
+def remove_from_cart(request):
+    if request.method == 'POST':
+        req_json = params = json.loads(request.body.decode('utf-8'))
+        profiler = key_to_user(req_json)
+        if profiler is None:
+            return HttpResponse(Error422('Wrong data'))
+        get_carts = [item for item in ShoppingCart.objects.filter(customer__user=profiler.user)]
+        for shop_c in get_carts:
+            if shop_c.active:
+                cart = shop_c
+        all_prod = cart.products.all()
+        for prod in all_prod:
+            if prod.SKU == req_json['SKU']:
+                if prod.stock > req_json['stock']:
+                    rez = prod.stock - req_json['stock']
+                    cart.products.filter(SKU=prod.SKU).update(stock=rez)
+                elif prod.stock == req_json['stock']:
+                        cart.products.remove(prod)
+                else:
+                    return HttpResponse(Error422('Wrong data'))
+        return HttpResponse(json.dumps({'products': [ProductSerializer(query).data for query in cart.products.all()]}))
 
 # def pretul_produsului(request):
 #     user = key_to_user(request)
