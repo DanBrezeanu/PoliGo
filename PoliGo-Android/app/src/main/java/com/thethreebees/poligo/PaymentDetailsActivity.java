@@ -31,6 +31,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.Serializable;
+import java.io.SerializablePermission;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +50,7 @@ public class PaymentDetailsActivity extends Activity {
     ImageView cardCompany;
     Button buttonRegiser;
     User loggedUser;
+    Class nextActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,8 @@ public class PaymentDetailsActivity extends Activity {
 
         progressBar = findViewById(R.id.progressBar);
         loggedUser = SharedPrefManager.getInstance(this).getUser();
+
+        nextActivity = (Class)getIntent().getSerializableExtra("nextActivity");
 
         mangeInputContext();
     }
@@ -250,7 +255,9 @@ public class PaymentDetailsActivity extends Activity {
 
                             //starting the profile activity
                             finish();
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+                            startActivity(new Intent(getApplicationContext(), nextActivity));
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

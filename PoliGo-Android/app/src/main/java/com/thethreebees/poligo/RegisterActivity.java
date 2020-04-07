@@ -116,6 +116,7 @@ public class RegisterActivity extends Activity {
                                     SharedPrefManager.getInstance(getApplicationContext()).userLogin(user);
 
                                     Intent toPayment = new Intent(RegisterActivity.this, PaymentDetailsActivity.class);
+                                    toPayment.putExtra("nextActivity", MainActivity.class);
                                     startActivity(toPayment);
                                     finish();
                                 } catch (JSONException e) {
