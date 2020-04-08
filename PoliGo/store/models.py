@@ -32,6 +32,7 @@ class ShoppingCart(models.Model):
     ID = models.AutoField(auto_created=True, primary_key=True, serialize=True, verbose_name='ID')
     totalCost = models.FloatField(default=0.0)
     active = models.BooleanField(default=True)
+    date = models.DateField(auto_now=True)
 
     products = models.ManyToManyField(Product)
     customer = models.ForeignKey(Profile, on_delete=models.CASCADE)

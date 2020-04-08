@@ -23,15 +23,15 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['SKU', 'name', 'price', 'stock']
 
-class ShoppingCartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ShoppingCart
-        fields = ['ID', 'totalCost', 'active', 'products', 'customer', 'shoppingHistory']
-
 class BankCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = BankCard
         fields = ['cardNumber', 'cardHolder', 'cardMonthExpire', 'cardYearExpire', 'cardCVV', 'cardCompany']
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShoppingCart
+        fields = ['ID', 'totalCost', 'date', 'products']
 
 """
 
