@@ -77,6 +77,8 @@ def check_stock(request):
     :rtype: HttpResponse
     """
 
+    # cOMENTARIU
+
     # Get the queried products
     if request.method == 'GET':
         products_json = db_utils.check_stock(request)
@@ -177,9 +179,12 @@ def shopping_cart(request):
     if request.method == 'GET':
         req_json = json.loads(request.body.decode('utf-8'))
         profiler = key_to_user(req_json)
+        
         if profiler is None:
             return HttpResponse(Error422('Wrong data'))
+        
         get_carts = [item for item in ShoppingCart.objects.filter(customer__user=profiler.user)]
+        
         for cart in get_carts:
             if cart.active:
                 return HttpResponse(json.dumps({'products': [ProductSerializer(query).data for query in cart.products.all()]}))
@@ -222,8 +227,10 @@ def place_order(request):
 
         shopping_cart.active = False
 
-        if ShoppingHistory.objects.filter(customer=user) != []:
-            shopping_cart.shoppingHistory = ShoppingHistory.objects.filter(customer=user)[0]
+        shopping_history = list(ShoppingHistory.objects.filter(customer=user))
+
+        if shopping_history != []:
+            shopping_cart.shoppingHistory = shopping_history[0]
         else:
             shopping_cart.shoppingHistory = ShoppingHistory(customer=user)
 
@@ -239,13 +246,14 @@ def shopping_history(request):
     user = key_to_user(json_from_request(request))
 
     if user is None:
-        return HttpResponse(Error422('No such user'))
+        return HttpResponse(Error503('No such user'))
 
     if request.method == 'GET':
         try:
             shopping_history = ShoppingHistory.objects.filter(customer=user)[0]
         except:
             return HttpResponse(Error422('No available Shopping History'))
+            
         shopping_carts = [ShoppingCartSerializer(cart).data for cart in ShoppingCart.objects.filter(shoppingHistory=shopping_history)]
         ret_json = json.dumps({'carts': shopping_carts})
     else:
@@ -256,21 +264,25 @@ def shopping_history(request):
 def add_to_cart(request):
     if request.method == 'POST':
         json_req = json_from_request(request)
+        user = key_to_user(json_req)
+
+        if user is None:
+            return HttpResponse(Error422('No such user'))
+
         if json_req['SKU'] is None:
             return HttpResponse(Error422('Wrong data'))
-
-        product = Product.objects.filter(SKU=json_req['SKU'])[0]
-        result = db_utils.add_to_cart(json_req)
+        
+        result = db_utils.add_to_cart(json_req, user)
 
         if result is None:
-            return HttpResponse(Error422('Failed add to cart'))
+            return HttpResponse(Error422('Failed to add to cart'))
         else:
             return HttpResponse(OK200(json.dumps({
-                'SKU' : product.SKU,
-                'name' : product.name,
-                'price' : product.price,
-                'stock' : product.stock
-                })))
+                'SKU' : result.SKU,
+                'name' : result.name,
+                'price' : result.price,
+                'stock' : result.stock
+            })))
     else:
         return HttpResponse(Error503('Only POST requests accepted'))
  
