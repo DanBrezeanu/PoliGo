@@ -2,6 +2,7 @@ from api.http_codes import *
 import functools
 
 from django.shortcuts import render, HttpResponse
+from api.api_utils import key_to_user, json_from_request
 
 def is_staff(func):
     """
@@ -23,6 +24,23 @@ def is_staff(func):
         # Acces Denied
         if profile is None or not profile.user.is_staff:
             return HttpResponse(Error403('Unauthorized'))
+
+        return func(*args, **kwargs)
+
+    return wrapper_decorator
+
+def is_user(func):
+    @functools.wraps(func)
+    def wrapper_decorator(*args, **kwargs):
+        # Get profile
+        try:
+           profile = key_to_user(json_from_request(args[0]))
+        except:
+            return HttpResponse(Error401('No such user'))
+
+        # No user with such key
+        if profile is None:
+            return HttpResponse(Error401('No such user'))
 
         return func(*args, **kwargs)
 

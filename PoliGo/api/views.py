@@ -12,35 +12,11 @@ from api import db_utils
 import json
 import store
 
-from api.api_decorators import is_staff, get, post
+from api.api_decorators import is_staff, get, post, is_user
+from api.api_utils import key_to_user, json_from_request
 
-def key_to_user(req_json):
-    """
-    Returns Profile associated to the api_key provided in request.
-    :param request: request from view function
-    :type request: HttpRequest
-    :returns: Profile with api_key equal to the one provided or None if not found
-    :rtype: Profile/None
-    """
-    
-    # Get API-KEY from request
-    try:    
-        api_key = req_json['api_key']
-    except: # No API-KEY provided
-        return None
-
-    # Find profile matching the API-KEY
-    try:    
-        return Profile.objects.get(api_key = api_key)
-    except store.models.Profile.DoesNotExist:
-        return None
-        
-
-def json_from_request(request):
-    return json.loads(request.body.decode('utf-8'))
-
+@get
 def Home(request):
-   # print(UserSerializer(request.user).data)
     return HttpResponse('ok')
 
 # @is_staff
@@ -63,26 +39,27 @@ def check_stock(request):
 
 
 
-# @is_staff
 @post
+# @is_staff
 def add_stock(request):
     result = db_utils.add_stock(json_from_request(request))
     return HttpResponse(result)
 
-# @is_staff
 @post
+# @is_staff
 def add_product(request):
     json_req = json_from_request(request)
     result = db_utils.add_product(json_req)
     return HttpResponse(result)
 
 
-# @is_staff
 @post
+# @is_staff
 def remove_stock(request):
     json_req = json_from_request(request)
     result = db_utils.remove_stock(json_req)
     return HttpResponse(result)
+
 
 @post
 def login(request):
@@ -128,8 +105,8 @@ def register(request):
         'email': user_profile.user.email,
     })))
 
-
 @post
+@is_user
 def add_card(request):
     json_req = json_from_request(request)
     user = key_to_user(json_req)
@@ -145,22 +122,20 @@ def add_card(request):
 
 
 @get
+@is_user
 def shopping_cart(request):
     req_json = json_from_request(request)
     user = key_to_user(req_json)
-
-    if user is None:
-        return HttpResponse(Error403('User does not exist'))
 
     cart = db_utils.shopping_cart(req_json, user)
     return HttpResponse(cart)
 
 @post
+@is_user
 def remove_from_cart(request):
     req_json = params = json.loads(request.body.decode('utf-8'))
     profiler = key_to_user(req_json)
-    if profiler is None:
-        return HttpResponse(Error422('Wrong data'))
+
     get_carts = [item for item in ShoppingCart.objects.filter(customer__user=profiler.user)]
     for shop_c in get_carts:
         if shop_c.active:
@@ -176,13 +151,11 @@ def remove_from_cart(request):
             else:
                 return HttpResponse(Error422('Wrong data'))
     return HttpResponse(json.dumps({'products': [ProductSerializer(query).data for query in cart.products.all()]}))
-      
+
 @post
+@is_user
 def place_order(request):
     user = key_to_user(json_from_request(request))
-
-    if user is None:
-        return HttpResponse(Error422('No such user'))
 
     try:
         # get active shopping cart
@@ -206,11 +179,9 @@ def place_order(request):
     return HttpResponse(OK200(json.dumps(ShoppingCartSerializer(shopping_cart).data)))
 
 @get
+@is_user
 def shopping_history(request):
     user = key_to_user(json_from_request(request))
-
-    if user is None:
-        return HttpResponse(Error503('No such user'))
 
     try:
         shopping_history = ShoppingHistory.objects.filter(customer=user)[0]
@@ -222,13 +193,12 @@ def shopping_history(request):
 
     return HttpResponse(OK200(ret_json))
 
+
 @post
+@is_user
 def add_to_cart(request):
     json_req = json_from_request(request)
     user = key_to_user(json_req)
-
-    if user is None:
-        return HttpResponse(Error422('No such user'))
 
     result = db_utils.add_to_cart(json_req, user)
 
