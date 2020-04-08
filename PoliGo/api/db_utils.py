@@ -133,25 +133,55 @@ def add_product(params):
 
     return OK200(None)
 
-    
-def add_to_cart(params, user):
-    
+def shopping_cart(params, user):
     try:
-        product = Product.objects.filter(SKU=params['SKU'])[0]
-    except IndexError:
-        return Error422('Nope')
+        cart = ShoppingCart.objects.get(customer=user, active=True)
+    except ShoppingCart.DoesNotExist:
+        return OK200(json.dumps({'products': []}))
 
+    products = [ProductSerializer(query).data for query in cart.products.all()]
+
+    return OK200( 
+        json.dumps({'products': products, 'total_sum': cart.totalCost})
+    )
+
+def add_to_cart(params, user):
+
+    # Necessary data must be available
+    if 'SKU' not in params or 'quantity' not in params:
+        return Error422('Wrong data')
+
+    # Get the base item to add
+    try:
+        item = Item.objects.get(SKU=params['SKU'])
+    except Item.DoesNotExist:
+        return Error422('Product with given SKU does not exist')
 
     quantity = params['quantity']
-    profile = views.key_to_user(params) # poate sa crape
 
-    profile == None
-    shopping_cart = ShoppingCart.objects.filter(customer=profile)[0] # crapa
-
+    # Get the shopping cart, create one if none exist
     try:
-        if shopping_cart.active: # poate sa crape 
-            for i in range(quantity):
-                shopping_cart.products.add(product)
-    except :
-        return None
-    return True
+        shopping_cart = ShoppingCart.objects.get(customer=user, active=True)
+    except ShoppingCart.DoesNotExist:
+        shopping_cart = ShoppingCart.objects.create(customer=user)
+
+    # Find out whether the product already exists in the cart, if not, create one
+    product = list(shopping_cart.products.filter(item=item))
+
+    if len(product) == 0:
+        product = Product.objects.create(item=item, quantity=quantity)
+    else:
+        product = product[0]
+        product.quantity += quantity
+
+    product.save()
+
+    shopping_cart.products.add(product)
+    shopping_cart.totalCost += item.price * quantity
+    shopping_cart.save()
+
+    return OK200(
+        json.dumps(ProductSerializer(product).data)
+    )
+
+    

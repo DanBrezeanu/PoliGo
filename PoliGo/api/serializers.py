@@ -31,7 +31,7 @@ class WarehouseItemSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['item', 'quantity']
+        fields = ['SKU', 'name', 'price', 'quantity']
 
 class BankCardSerializer(serializers.ModelSerializer):
     class Meta:

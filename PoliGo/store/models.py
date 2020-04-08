@@ -32,6 +32,18 @@ class Product(models.Model):
     def __str__(self):
         return self.item.name
 
+    @property
+    def SKU(self):
+        return self.item.SKU
+
+    @property
+    def name(self):
+        return self.item.name
+
+    @property
+    def price(self):
+        return self.item.price
+
 class WarehouseItem(models.Model):
     item = models.ForeignKey(Item, null=False, on_delete=models.CASCADE)
     stock = models.IntegerField(null=False, default=0)
