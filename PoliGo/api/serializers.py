@@ -1,11 +1,22 @@
 from django.contrib.auth.models import User
-from store.models import BankCard, Product, Profile, ShoppingCart
+from store.models import Profile, Product, BankCard, ShoppingCart, ShoppingHistory
 from rest_framework import serializers
+
+"""
+
+Serializers
+
+"""
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username']
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['ID', 'name', 'api_key']  
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,6 +33,28 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         model = ShoppingCart
         fields = ['ID', 'totalCost', 'date', 'products']
 
+"""
+
+Deseralizers
+
+""" 
+
+class UserDeserializer:
+    @staticmethod
+    def deserialize(**kwargs):
+        return User(
+            username = kwargs['username']
+        )
+
+class ProfileDeserializer:
+    @staticmethod
+    def deserialize(**kwargs):
+        return Profile(
+            ID = kwargs['ID'],
+            name = kwargs['name'],
+            api_key = kwargs['api_key']
+        )
+
 class ProductDeserializer:
     @staticmethod
     def deserialize(**kwargs):
@@ -30,6 +63,18 @@ class ProductDeserializer:
             name = kwargs['name'],
             price = kwargs['price'],
             stock = kwargs['stock']
+        )
+
+class ShoppingCartDeserializer:
+    @staticmethod
+    def deserialize(**kwargs):
+        return ShoppingCart(
+            ID = kwargs['ID'],
+            totalCost = kwargs['totalCost'],
+            active = kwargs['active'],
+            products = kwargs['customer'],
+            customer = kwargs['customer'],
+            shoppingHistory = kwargs['shoppingHistory']
         )
 
 class BankCardDeserializer:

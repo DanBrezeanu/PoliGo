@@ -205,19 +205,7 @@ def remove_from_cart(request):
                 else:
                     return HttpResponse(Error422('Wrong data'))
         return HttpResponse(json.dumps({'products': [ProductSerializer(query).data for query in cart.products.all()]}))
-
-# def pretul_produsului(request):
-#     user = key_to_user(request)
-
-#     if user is None:
-#         nu exista utilizator cu cheia asta
-
-#     user -> profile 
-#     shopping_cart-ul -> profile-ului
-#     cautati produsul cu SKU furnizat
-#     adaugati produsul -> shopping cart 
-
-# TODO:
+      
 
 def place_order(request):
     user = key_to_user(json_from_request(request))
@@ -265,11 +253,24 @@ def shopping_history(request):
 
     return HttpResponse(OK200(ret_json))
 
+def add_to_cart(request):
+    if request.method == 'POST':
+        json_req = json_from_request(request)
+        if json_req['SKU'] is None:
+            return HttpResponse(Error422('Wrong data'))
 
-# ENDPOINT-URI PENTRU UTILIZATORI (fara @is_staff)
-# am scanat produsul -> POST REQ 
-# am eliminat din cos -> POST REQ
-# pretul produsului -> GET
-# historicul cumparaturilor -> GET
-# am terminat cumparaturile -> POST REQ
-# orice altceva
+        product = Product.objects.filter(SKU=json_req['SKU'])[0]
+        result = db_utils.add_to_cart(json_req)
+
+        if result is None:
+            return HttpResponse(Error422('Failed add to cart'))
+        else:
+            return HttpResponse(OK200(json.dumps({
+                'SKU' : product.SKU,
+                'name' : product.name,
+                'price' : product.price,
+                'stock' : product.stock
+                })))
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
+ 
