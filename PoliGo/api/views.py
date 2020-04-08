@@ -79,6 +79,7 @@ def check_stock(request):
 
     # cOMENTARIU
 
+    #cod frumos
     # Get the queried products
     if request.method == 'GET':
         products_json = db_utils.check_stock(request)
