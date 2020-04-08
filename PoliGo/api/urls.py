@@ -4,8 +4,10 @@ from api import views
 
 urlpatterns = [
     path('', views.Home),
-    path('checkstocks/', views.check_stock),
-    path('addstocks/', views.add_stock),
+    path('checkstock/', views.check_stock),
+    path('addstock/', views.add_stock),
+    path('removestock/', views.remove_stock),
+    path('addproduct/', views.add_product),
     path('login/', views.login),
     path('signup/', views.register),
     path('shoppinghistory/', views.shopping_history),

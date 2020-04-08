@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from store.models import Profile, Product, BankCard, ShoppingCart, ShoppingHistory
+from store.models import *
 from rest_framework import serializers
 
 """
@@ -18,10 +18,20 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['ID', 'name', 'api_key']  
 
+class ItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['SKU', 'name', 'price']
+
+class WarehouseItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WarehouseItem
+        fields = ['item', 'stock']
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['SKU', 'name', 'price', 'stock']
+        fields = ['item', 'quantity']
 
 class BankCardSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,14 +65,29 @@ class ProfileDeserializer:
             api_key = kwargs['api_key']
         )
 
+class ItemDeserializer:
+    @staticmethod
+    def deserialize(**kwargs):
+        return Item(
+            SKU = kwargs['SKU'],
+            name = kwargs['name'],
+            price = kwargs['price']
+        )
+
 class ProductDeserializer:
     @staticmethod
     def deserialize(**kwargs):
         return Product(
-            SKU = kwargs['SKU'],
-            name = kwargs['name'],
-            price = kwargs['price'],
-            stock = kwargs['stock']
+            item = kwargs['item'],
+            quantity = kwargs['quantity'],
+        )
+
+class WarehouseItemDeserializer:
+    @staticmethod
+    def deserialize(**kwargs):
+        return WarehouseItem(
+            item = kwargs['item'],
+            stock = kwargs['stock'],
         )
 
 class ShoppingCartDeserializer:

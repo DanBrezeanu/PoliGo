@@ -16,14 +16,28 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
-class Product(models.Model):
+
+class Item(models.Model):
     SKU = models.CharField(primary_key=True, max_length=255, null=False, unique=True, verbose_name='SKU')
     name = models.CharField(max_length=1000)
     price = models.FloatField()
-    stock = models.IntegerField()
 
     def __str__(self):
         return self.name
+
+class Product(models.Model):
+    item = models.ForeignKey(Item, null=False, on_delete=models.CASCADE)
+    quantity = models.IntegerField(null=False, default=0)
+
+    def __str__(self):
+        return self.item.name
+
+class WarehouseItem(models.Model):
+    item = models.ForeignKey(Item, null=False, on_delete=models.CASCADE)
+    stock = models.IntegerField(null=False, default=0)
+
+    def __str__(self):
+        return self.item.name
 
 class ShoppingHistory(models.Model):
     customer = models.ForeignKey(Profile, on_delete=models.CASCADE)

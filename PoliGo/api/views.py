@@ -50,7 +50,11 @@ def is_staff(func):
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
         # Get profile
-        profile = key_to_user(args[0])
+        try:
+            profile = key_to_user(json_from_request(args[0]))
+        except:
+            return HttpResponse(Error403('Unauthorized'))
+
 
         # Acces Denied
         if profile is None or not profile.user.is_staff:
@@ -68,7 +72,7 @@ def Home(request):
 # @is_staff      
 def check_stock(request):
     """
-    Provides and ENDPOINT for querying the products.
+    Provides an ENDPOINT for querying the products.
 
     :param request: implicit request
     :type request: HttpRequest
@@ -77,11 +81,10 @@ def check_stock(request):
     :rtype: HttpResponse
     """
 
-    # cOMENTARIU
-
     # Get the queried products
     if request.method == 'GET':
-        products_json = db_utils.check_stock(request)
+        json_req = json_from_request(request)
+        products_json = db_utils.check_stock(json_req)
     else:
         return HttpResponse(Error503('Only GET requests accepted'))
 
@@ -91,24 +94,25 @@ def check_stock(request):
 def add_stock(request):
     if request.method == 'POST':
         result = db_utils.add_stock(json_from_request(request))
-
-        if result is None:
-            return HttpResponse(Error422('Wrong data'))
-        else:
-            return HttpResponse(OK200(None))
+        return HttpResponse(result)
     else:
         return HttpResponse(Error503('Only POST requests accepted'))
 
+# @is_staff
+def add_product(request):
+    if request.method == 'POST':
+        json_req = json_from_request(request)
+        result = db_utils.add_product(json_req)
+        return HttpResponse(result)
+    else:
+        return HttpResponse(Error503('Only POST requests accepted'))
 
 # @is_staff
 def remove_stock(request):
     if request.method == 'POST':
-        result = db_utils.remove_stock(json_from_request(request))
-
-        if result is None:
-            return HttpResponse(Error422('Wrong data'))
-        else:
-            return HttpResponse(OK200(None))
+        json_req = json_from_request(request)
+        result = db_utils.remove_stock(json_req)
+        return HttpResponse(result)
     else:
         return HttpResponse(Error503('Only POST requests accepted'))
 
