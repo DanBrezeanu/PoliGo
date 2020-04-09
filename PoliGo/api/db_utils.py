@@ -1,8 +1,13 @@
 from api.serializers import *
-from api.http_codes import Error422, OK200
+from api.http_codes import Error422, OK200, Error403, Error401
 from api import views
 from store.models import *
 import json
+
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+
+from django.db.utils import IntegrityError
 
 import store
 
@@ -133,17 +138,13 @@ def add_product(params):
 
     return OK200(None)
 
-def shopping_cart(params, user):
+def shopping_cart(user):
     try:
         cart = ShoppingCart.objects.get(customer=user, active=True)
     except ShoppingCart.DoesNotExist:
-        return OK200(json.dumps({'products': []}))
+        return Error422('No active shopping cart')
 
-    products = [ProductSerializer(query).data for query in cart.products.all()]
-
-    return OK200( 
-        json.dumps({'products': products, 'total_sum': cart.totalCost})
-    )
+    return OK200(json.dumps(ShoppingCartSerializer(cart).data))
 
 def add_to_cart(params, user):
 
@@ -184,4 +185,115 @@ def add_to_cart(params, user):
         json.dumps(ProductSerializer(product).data)
     )
 
+def add_card(params, user):
+    try:
+        card_details = params['card_details']
+    except KeyError:
+        return Error422('No card details provided')
+
+    try:
+        new_card = BankCardDeserializer.deserialize(**card_details, user=user)
+        new_card.save()
+    except:
+        return Error422('Wrong data')
     
+    cards = [BankCardSerializer(card).data for card in BankCard.objects.filter(profile=user)]
+    return OK200(json.dumps(
+            {'cards': cards}
+        ))
+
+def place_order(user):
+    # Get active shopping cart
+    try:
+        shopping_cart = ShoppingCart.objects.get(customer=user, active=True)
+    except ShoppingCart.DoesNotExist:
+        return Error422('No active shopping cart')
+
+    shopping_cart.active = False
+
+    try:
+        shopping_history = ShoppingHistory.objects.get(customer=user)
+    except ShoppingHistory.DoesNotExist:
+        shopping_history = ShoppingHistory.objects.create(customer=user)
+
+    shopping_cart.shoppingHistory = shopping_history
+    shopping_cart.save()
+
+    return OK200(json.dumps(ShoppingCartSerializer(shopping_cart).data))
+
+def shopping_history(user):
+    try:
+        shopping_history = ShoppingHistory.objects.filter(customer=user)[0]
+    except:
+        return Error422('No shopping history available')
+        
+    shopping_carts = [ShoppingCartSerializer(cart).data for cart in ShoppingCart.objects.filter(shoppingHistory=shopping_history)]
+    return OK200(json.dumps({'carts': shopping_carts}))
+
+def remove_from_cart(params, user):
+    try:
+        cart = ShoppingCart.objects.get(customer=user, active=True)
+    except ShoppingCart.DoesNotExist:
+        return Error422('No shopping cart available')
+
+    try:
+        SKU = params['SKU']
+        quantity = params['quantity']
+    except KeyError:
+        return Error422('Wrong data')
+
+    try:
+        product = cart.products.get(SKU=SKU)
+    except Product.DoesNotExist:
+        return Error422('No item with provided SKU')
+
+    if product.quantity < quantity:
+        return Error422('Available quantity smaller than requested removal')
+
+    if product.quantity == quantity:
+        cart.products.remove(product)
+        cart.save()
+    else:
+        product.quantity -= quantity
+        product.save()
+
+    return OK200(json.dumps(ShoppingCartSerializer(cart).data))
+
+def login(params):
+    if 'username' not in params or 'password' not in params:
+        return Error422('No credentials provided')
+
+    user = authenticate(username=params['username'], password=params['password'])
+
+    if user is None:
+        return Error403('Invalid credentials')
+
+    try:
+        profile = Profile.objects.get(user=user)
+    except Profile.DoesNotExist:
+        return Error422('No profile for provided user')
+
+    cards = [BankCardSerializer(card).data for card in BankCard.objects.filter(profile=profile)]
+    profile_dict = dict(ProfileSerializer(profile).data)
+    profile_dict.update({'cards': cards})
+
+    return OK200(json.dumps(profile_dict))
+
+def register(params):
+    if not all([param in params for param in ['email', 'username', 'password']]):
+        return Error422('No credentials provided')
+
+    try:
+        new_user = User.objects.create_user(
+                    email=params['email'],
+                    username=params['username'],
+                    password=params['password']
+                )
+
+        new_user.save()
+    except IntegrityError:
+        return Error401('Username or email already exists')
+
+    user_profile = Profile.objects.create(user=new_user)
+
+    return OK200(json.dumps(ProfileSerializer(user_profile).data))

@@ -10,12 +10,21 @@ def generate_api_key():
 
 class Profile(models.Model):
     ID = models.AutoField(auto_created=True, primary_key=True, serialize=True, verbose_name='ID')
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
     api_key = models.CharField(max_length=255, default=generate_api_key, null=False)
+    
+    User._meta.get_field('email')._unique = True
 
     def __str__(self):
         return self.user.username
 
+    @property
+    def name(self):
+        return self.user.username
+
+    @property
+    def email(self):
+        return self.user.email
 
 class Item(models.Model):
     SKU = models.CharField(primary_key=True, max_length=255, null=False, unique=True, verbose_name='SKU')

@@ -37,8 +37,6 @@ def check_stock(request):
     products_json = db_utils.check_stock(json_req)
     return HttpResponse(OK200(products_json))
 
-
-
 @post
 # @is_staff
 def add_stock(request):
@@ -64,61 +62,26 @@ def remove_stock(request):
 @post
 def login(request):
     json_req = json_from_request(request)
-    user = authenticate(username=json_req['username'], password=json_req['password'])
-
-    if user is None:
-        return HttpResponse(Error403('Invalid credentials'))
-
-    profile = Profile.objects.filter(user=user)[0]
-    cards = [BankCardSerializer(card).data for card in BankCard.objects.filter(profile=profile)]
-
-    return HttpResponse(OK200(json.dumps({
-        'api_key': profile.api_key,
-        'name': profile.user.username,
-        'email': profile.user.email,
-        'cards': cards
-    })))
+    
+    result = db_utils.login(json_req)
+    return HttpResponse(result)
 
 
 @post
 def register(request):
     json_req = json_from_request(request)
 
-    try:
-        new_user = User.objects.create_user(
-                    email=json_req['email'],
-                    username=json_req['username'],
-                    password=json_req['password']
-                )
-
-        new_user.save()
-    except django.db.utils.IntegrityError:
-        return HttpResponse(Error401('Username already exists'))
-
-
-    user_profile = Profile(user=new_user)
-    user_profile.save()
-
-    return HttpResponse(OK200(json.dumps({
-        'api_key': user_profile.api_key,
-        'name': user_profile.user.username,
-        'email': user_profile.user.email,
-    })))
-
+    result = db_utils.register(json_req)
+    return HttpResponse(result)
+    
 @post
 @is_user
 def add_card(request):
     json_req = json_from_request(request)
     user = key_to_user(json_req)
 
-    card_details = json_req['card_details']
-
-    new_card = BankCardDeserializer.deserialize(**card_details, user=user)
-    new_card.save()
-    
-    cards = [BankCardSerializer(card).data for card in BankCard.objects.filter(profile=user)]
-
-    return HttpResponse(OK200(json.dumps({'cards': cards})))
+    result = db_utils.add_card(json_req, user)
+    return HttpResponse(result)
 
 
 @get
@@ -127,71 +90,33 @@ def shopping_cart(request):
     req_json = json_from_request(request)
     user = key_to_user(req_json)
 
-    cart = db_utils.shopping_cart(req_json, user)
+    cart = db_utils.shopping_cart(user)
     return HttpResponse(cart)
 
 @post
 @is_user
 def remove_from_cart(request):
-    req_json = params = json.loads(request.body.decode('utf-8'))
-    profiler = key_to_user(req_json)
+    json_req = json.loads(request.body.decode('utf-8'))
+    user = key_to_user(json_req)
 
-    get_carts = [item for item in ShoppingCart.objects.filter(customer__user=profiler.user)]
-    for shop_c in get_carts:
-        if shop_c.active:
-            cart = shop_c
-    all_prod = cart.products.all()
-    for prod in all_prod:
-        if prod.SKU == req_json['SKU']:
-            if prod.stock > req_json['stock']:
-                rez = prod.stock - req_json['stock']
-                cart.products.filter(SKU=prod.SKU).update(stock=rez)
-            elif prod.stock == req_json['stock']:
-                    cart.products.remove(prod)
-            else:
-                return HttpResponse(Error422('Wrong data'))
-    return HttpResponse(json.dumps({'products': [ProductSerializer(query).data for query in cart.products.all()]}))
+    result = db_utils.remove_from_cart(json_req, user)
+    return HttpResponse(result)
 
 @post
 @is_user
 def place_order(request):
     user = key_to_user(json_from_request(request))
 
-    try:
-        # get active shopping cart
-        shopping_cart = ShoppingCart.objects.filter(customer=user, active=True)[0]
-    except:
-        return HttpResponse(Error422('No active Shopping Cart'))
-
-    shopping_cart.active = False
-
-    shopping_history = list(ShoppingHistory.objects.filter(customer=user))
-
-    if shopping_history != []:
-        shopping_cart.shoppingHistory = shopping_history[0]
-    else:
-        shopping_cart.shoppingHistory = ShoppingHistory(customer=user)
-
-    shopping_cart.shoppingHistory.save()
-    shopping_cart.save()
-        
-
-    return HttpResponse(OK200(json.dumps(ShoppingCartSerializer(shopping_cart).data)))
+    result = db_utils.place_order(user)
+    return HttpResponse(result)
 
 @get
 @is_user
 def shopping_history(request):
     user = key_to_user(json_from_request(request))
 
-    try:
-        shopping_history = ShoppingHistory.objects.filter(customer=user)[0]
-    except:
-        return HttpResponse(Error422('No available Shopping History'))
-        
-    shopping_carts = [ShoppingCartSerializer(cart).data for cart in ShoppingCart.objects.filter(shoppingHistory=shopping_history)]
-    ret_json = json.dumps({'carts': shopping_carts})
-
-    return HttpResponse(OK200(ret_json))
+    result = db_utils.shopping_history(user)
+    return HttpResponse(result)
 
 
 @post

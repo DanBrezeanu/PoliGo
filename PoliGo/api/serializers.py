@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['ID', 'name', 'api_key']  
+        fields = ['api_key', 'name', 'email']  
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,6 +39,7 @@ class BankCardSerializer(serializers.ModelSerializer):
         fields = ['cardNumber', 'cardHolder', 'cardMonthExpire', 'cardYearExpire', 'cardCVV', 'cardCompany']
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True)
     class Meta:
         model = ShoppingCart
         fields = ['ID', 'totalCost', 'date', 'products']
@@ -97,7 +98,7 @@ class ShoppingCartDeserializer:
             ID = kwargs['ID'],
             totalCost = kwargs['totalCost'],
             active = kwargs['active'],
-            products = kwargs['customer'],
+            products = kwargs['products'],
             customer = kwargs['customer'],
             shoppingHistory = kwargs['shoppingHistory']
         )
