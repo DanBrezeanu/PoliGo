@@ -24,7 +24,8 @@ def key_to_user(req_json):
         
 
 def json_from_request(request):
-    try:
+    # try:
+        print(request.body)
         return json.loads(request.body.decode('utf-8'))
-    except:
-        return None
+    # except:
+    #     return None

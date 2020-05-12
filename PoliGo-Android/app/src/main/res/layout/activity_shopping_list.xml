@@ -13,13 +13,26 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <ListView
-            android:id="@+id/list_item"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.8"
-            android:transcriptMode="alwaysScroll"/>
+            android:layout_weight="0.8">
+            <ListView
+                android:id="@+id/list_item"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:transcriptMode="alwaysScroll"/>
 
+            <TextView
+                android:id="@+id/textViewNoProducts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No products in cart yet"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                android:textColor="#CDCDCD"
+                android:textSize="18sp" />
+        </FrameLayout>
 
         <Button
             android:id="@+id/btn_add_prod"

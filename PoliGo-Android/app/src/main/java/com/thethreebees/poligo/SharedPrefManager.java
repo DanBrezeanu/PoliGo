@@ -115,8 +115,8 @@ public class SharedPrefManager {
 
         HashSet<String> prodStrings = new HashSet<>();
 
-        for (Pair<Product, Integer> prod : cart.getProducts()) {
-            prodStrings.add(prod.second + "%%" + prod.first.toString());
+        for (Product prod : cart.getProducts()) {
+            prodStrings.add(prod.getQuantity() + "%%" + prod.toString());
         }
 
         editor.putStringSet("products", prodStrings);

@@ -24,7 +24,7 @@ public class ProductAdapter extends BaseAdapter {
     private SharedPrefManager sharedPref;
     private TextView totalSumTextView;
     private Button finishedShopping;
-    private ArrayList<Pair<Product, Integer>> products;
+    private ArrayList<Product> products;
 
     public ProductAdapter (Activity context) {
         this.context = context;
@@ -72,7 +72,7 @@ public class ProductAdapter extends BaseAdapter {
                     int totalQuantity = Integer.parseInt(product.quantity.getText().toString());
 
                     for (int j = 0; j < totalQuantity; ++j)
-                        removeProduct(products.get(i).first.getSKU());
+                        removeProduct(products.get(i).getSKU());
 
                     reloadElementsUI();
                     ProductAdapter.this.notifyDataSetChanged();
@@ -82,8 +82,8 @@ public class ProductAdapter extends BaseAdapter {
         final ImageButton increment_quantity = element.findViewById(R.id.add_quantity);
         increment_quantity.setOnClickListener(
                 view12 -> {
-                    addProduct(products.get(i).first, 1);
-                    product.quantity.setText(products.get(i).second.toString());
+                    addProduct(products.get(i), 1);
+                    product.quantity.setText(products.get(i).getQuantity().toString());
 
                     reloadElementsUI();
                     ProductAdapter.this.notifyDataSetChanged();
@@ -93,12 +93,12 @@ public class ProductAdapter extends BaseAdapter {
         final ImageButton decrement_quantity = element.findViewById(R.id.remove_quantity);
         decrement_quantity.setOnClickListener(
                 view13 -> {
-                    int initial_quant = products.get(i).second;
+                    int initial_quant = products.get(i).getQuantity();
 
-                    removeProduct(products.get(i).first.getSKU());
+                    removeProduct(products.get(i).getSKU());
 
                     if (initial_quant > 1)
-                        product.quantity.setText(products.get(i).second.toString());
+                        product.quantity.setText(products.get(i).getQuantity().toString());
 
                     reloadElementsUI();
                     ProductAdapter.this.notifyDataSetChanged();
@@ -109,10 +109,10 @@ public class ProductAdapter extends BaseAdapter {
         element.setTag(product);
 
         TagProduct tag = (TagProduct) element.getTag();
-        tag.name.setText(products.get(i).first.getName());
-        tag.price.setText(products.get(i).first.getPrice().toString());
-        tag.image.setImageResource(products.get(i).first.getImageResource());
-        tag.quantity.setText(products.get(i).second.toString());
+        tag.name.setText(products.get(i).getName());
+        tag.price.setText(products.get(i).getPrice().toString());
+        tag.image.setImageResource(products.get(i).getImageResource());
+        tag.quantity.setText(products.get(i).getQuantity().toString());
 
         reloadElementsUI();
         return element;
@@ -150,15 +150,17 @@ class Product {
     private String SKU;
     private String name;
     private Double price;
+    private Integer quantity;
     private int imageResource;
 
     public Product() { }
 
-    public Product(String SKU, String name, Double price, int imageResource) {
+    public Product(String SKU, String name, Double price, int imageResource, int quantity) {
         this.SKU = SKU;
         this.name = name;
         this.price = price;
         this.imageResource = imageResource;
+        this.quantity = quantity;
     }
 
     public String getSKU() {
@@ -185,6 +187,14 @@ class Product {
         this.price = price;
     }
 
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
     public int getImageResource() {
         return imageResource;
     }
@@ -204,7 +214,7 @@ class Product {
             String[] productPattern = productString.split(Pattern.quote("|"));
 
             return new Product(productPattern[0], productPattern[1], Double.parseDouble(productPattern[2]),
-                               Integer.parseInt(productPattern[3]));
+                               Integer.parseInt(productPattern[3]), 0);
 
     }
 }

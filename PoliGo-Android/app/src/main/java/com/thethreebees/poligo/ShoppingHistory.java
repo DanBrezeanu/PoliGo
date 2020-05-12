@@ -44,55 +44,7 @@ public class ShoppingHistory {
         }
 
 
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, URLs.URL_SHOPPING_HISTORY, cardDetails,
-                response -> {
-                    progressBar.setVisibility(View.GONE);
-
-                    try {
-                        JSONObject obj = response;
-
-                        JSONArray shoppingCarts = obj.getJSONArray("carts");
-
-                        for (int i = 0; i < shoppingCarts.length(); ++i) {
-                            JSONObject cart = (JSONObject) shoppingCarts.get(i);
-
-                            HashMap<String, String> cartInfoJson = new HashMap<>();
-                            String cartNumber = String.format("%d", cart.getInt("number"));
-                            cartInfoJson.put("number", cartNumber);
-                            cartInfoJson.put("date", cart.getString("date"));
-                            cartInfoJson.put("totalSum",  String.format("%.2f", cart.getDouble("total_sum")));
-
-                            cartInfo.add(cartInfoJson);
-
-                            JSONArray products = cart.getJSONArray("products");
-                            ArrayList<Pair<Product, Integer>> newProducts = new ArrayList<>();
-
-                            for (int j = 0; j < products.length(); ++j) {
-                                JSONObject prod = (JSONObject) products.get(j);
-
-                                Product new_prod = new Product(
-                                        prod.getString("SKU"),
-                                        prod.getString("name"),
-                                        prod.getDouble("price"),
-                                        image
-                                );
-
-                                newProducts.add(new Pair<>(new_prod, prod.getInt("quantity")));
-                            }
-
-                            productsInfo.put(cartNumber, newProducts);
-
-                            ((ShoppingHistoryActivity) context).expandableListViewAdapter.notifyDataSetChanged();
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                error -> Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show());
-
-        progressBar.setVisibility(View.VISIBLE);
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonRequest);
+        RequestManager2.getInstance().shoppingHistory((ShoppingHistoryActivity) context, this);
     }
 
 

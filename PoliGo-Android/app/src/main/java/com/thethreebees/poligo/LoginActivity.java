@@ -75,61 +75,7 @@ public class LoginActivity extends Activity {
             return;
         }
 
-        JSONObject params = new JSONObject();
-
-        try {
-            params.put("username", username);
-            params.put("password", password);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, URLs.URL_LOGIN, params,
-                response -> {
-                    progressBar.setVisibility(View.GONE);
-
-                    try {
-                        if (response.getInt("code") == 200) {
-
-                            User user = new User(
-                                    response.getString("api_key"),
-                                    response.getString("name"),
-                                    response.getString("email"),
-                                    null
-                            );
-
-                            ArrayList<BankCard> bankCards = new ArrayList<>();
-                            JSONArray responseBankCards = response.getJSONArray("cards");
-
-                            for (int i = 0; i < responseBankCards.length(); ++i) {
-                                JSONObject card = (JSONObject) responseBankCards.get(i);
-
-                                bankCards.add(new BankCard(
-                                        card.getString("cardNumber"),
-                                        card.getString("cardHolder"),
-                                        card.getString("cardMonthExpire"),
-                                        card.getString("cardYearExpire"),
-                                        card.getString("cardCVV"),
-                                        card.getString("cardCompany")
-                                ));
-                            }
-
-                            user.setCards(bankCards);
-
-                            SharedPrefManager.getInstance(getApplicationContext()).userLogin(user);
-                            finish();
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        } else {
-                            etPassword.setError("Invalid password or username");
-                            etPassword.requestFocus();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                error -> Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show());
-
-        VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        RequestManager2.getInstance().login(username, password, this);
         progressBar.setVisibility(View.VISIBLE);
 
 

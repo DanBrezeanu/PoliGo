@@ -5,8 +5,17 @@ import android.util.Pair;
 import java.util.ArrayList;
 
 public class ShoppingCart {
-    private ArrayList<Pair<Product, Integer>> products;
+    private ArrayList<Product> products;
     private Double totalSum;
+    private String date;
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 
     public ShoppingCart() {
         products = new ArrayList<>();
@@ -21,11 +30,13 @@ public class ShoppingCart {
         this.totalSum = totalSum;
     }
 
-    public ArrayList<Pair<Product, Integer>> getProducts() {
+    public ArrayList<Product> getProducts() {
+        RequestManager2.getInstance().shoppingCart(this);
+
         return products;
     }
 
-    public void setProducts(ArrayList<Pair<Product, Integer>> products) {
+    public void setProducts(ArrayList<Product> products) {
         this.products = products;
     }
 
@@ -36,28 +47,28 @@ public class ShoppingCart {
     public void addProduct(Product p) {
 
         for (int i = 0; i < products.size(); ++i) {
-            if (products.get(i).first.getSKU().equals(p.getSKU())) {
-                products.set(i, new Pair<>(products.get(i).first,
-                                           products.get(i).second + 1));
+            if (products.get(i).getSKU().equals(p.getSKU())) {
+                products.get(i).setQuantity(products.get(i).getQuantity() + 1);
 
                 totalSum += p.getPrice();
                 return;
             }
         }
 
-        products.add(new Pair<>(p, 1));
+        p.setQuantity(1);
+        products.add(p);
         totalSum += p.getPrice();
     }
 
     public synchronized void removeProduct(String SKU) {
         for (int i = 0; i < products.size(); ++i) {
-            if (products.get(i).first.getSKU().equals(SKU)) {
-                totalSum = Math.max(totalSum - products.get(i).first.getPrice(), 0);
+            if (products.get(i).getSKU().equals(SKU)) {
+                totalSum = Math.max(totalSum - products.get(i).getPrice(), 0);
 
-                if (products.get(i).second == 1)
+                if (products.get(i).getQuantity() == 1)
                     products.remove(products.get(i));
                 else
-                    products.set(i, new Pair<>(products.get(i).first, products.get(i).second - 1));
+                    products.get(i).setQuantity(products.get(i).getQuantity() - 1);
                 return;
             }
         }

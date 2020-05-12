@@ -26,19 +26,19 @@ import java.util.HashMap;
 
 
 public class ShoppingListActivity extends Activity {
-    private ListView productList;
+    public ListView productList;
     ProductAdapter productAdapter;
-    private EditText addNewProduct;
-    private Button addButton;
+    public EditText addNewProduct;
+    public Button addButton;
     final int image = R.drawable.lab5_car_icon;
     final int LAUNCH_BARCODE_SCANNING = 1;
     String result;
-    HashMap<String, String> params = new HashMap<>();
     ProgressBar progressBar;
     TextView totalSum;
     Context context;
     public ShoppingCart cart;
     SharedPrefManager sharedPref;
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +47,19 @@ public class ShoppingListActivity extends Activity {
 
         context = this;
         sharedPref = SharedPrefManager.getInstance(this);
+        user = sharedPref.getUser();
 
         productList = findViewById(R.id.list_item);
         addButton = findViewById(R.id.btn_add_prod);
         progressBar = findViewById(R.id.progressBar);
         totalSum = findViewById(R.id.total_sum);
+        cart = new ShoppingCart();
 
         resumeShopping();
     }
 
     @SuppressLint("SetTextI18n")
     public void resumeShopping() {
-        cart = sharedPref.getShoppingCart();
-        System.out.println(cart.getCount());
-
         productAdapter = new ProductAdapter(this);
         productList.setAdapter(productAdapter);
 
@@ -80,62 +79,10 @@ public class ShoppingListActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == LAUNCH_BARCODE_SCANNING && resultCode == Activity.RESULT_OK) {
-                result = data.getStringExtra("result");
+            result = data.getStringExtra("result");
 
-                params.put("SKU", result);
-                params.put("api_key", "w/e"); // NOT IMPLEMENTED YET
-
-                Uri.Builder uriEndpoint = new Uri.Builder()
-                        .scheme(URLs.PROTOCOL)
-                        .encodedAuthority(URLs.AUTHORITY)
-                        .appendEncodedPath(URLs.ROOT_PATH)
-                        .appendEncodedPath("checkstocks/")
-                        .appendQueryParameter("SKU", params.get("SKU"))
-                        .appendQueryParameter("api_key", params.get("api_key"));
-
-                String URL = uriEndpoint.build().toString();
-                Log.d("URL", URL);
-
-                JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, new JSONObject(),
-                        response -> {
-                            progressBar.setVisibility(View.GONE);
-
-                            try {
-                                if (response.getInt("code") == 200 && response.getJSONArray("products").length() > 0) {
-                                    JSONObject prod = (JSONObject) response.getJSONArray("products").get(0);
-
-
-                                    Product new_prod = new Product(
-                                            prod.getString("SKU"),
-                                            prod.getString("name"),
-                                            prod.getDouble("price"),
-                                            image
-                                    );
-
-                                    ((ShoppingListActivity) context).productAdapter.addProduct(new_prod, 1);
-
-
-                                } else {
-                                    AlertDialog alertDialog = new AlertDialog.Builder((ShoppingListActivity)context )
-                                            .setIcon(android.R.drawable.ic_dialog_alert)
-                                            .setMessage("This product does not exist")
-                                            .setNeutralButton("OK", (dialogInterface, i) -> dialogInterface.dismiss())
-                                            .show();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        },
-                        error -> {
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-                        });
-
-            VolleySingleton.getInstance(this).addToRequestQueue(getRequest);
-            progressBar.setVisibility(View.VISIBLE);
+            RequestManager2.getInstance().addToCart(this, result);
         }
-            if (resultCode == Activity.RESULT_CANCELED) {
-            }
     }
 
 

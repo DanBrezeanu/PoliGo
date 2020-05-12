@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class ShoppingHistoryActivity extends Activity {
     private ExpandableListView expandableListView;
     public ExpandableListViewAdapter expandableListViewAdapter;
     ShoppingHistory shoppingHistory;
+    public ProgressBar progressBar;
 
     ArrayList<HashMap<String, String>> cartInfo;
     HashMap<String, ArrayList<Pair<Product, Integer>>> productsInfo;
@@ -26,6 +28,7 @@ public class ShoppingHistoryActivity extends Activity {
         setContentView(R.layout.activity_shopping_history);
 
         expandableListView = findViewById(R.id.expandableListView);
+        progressBar = findViewById(R.id.progressBar);
         shoppingHistory = new ShoppingHistory(this);
 
         setClickListeners();

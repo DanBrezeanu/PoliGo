@@ -84,10 +84,13 @@ def add_card(request):
     return HttpResponse(result)
 
 
-@get
-@is_user
+# @get
+# @is_user
 def shopping_cart(request):
+    print(request.body)
     req_json = json_from_request(request)
+
+    print(req_json)
     user = key_to_user(req_json)
 
     cart = db_utils.shopping_cart(user)
@@ -110,7 +113,7 @@ def place_order(request):
     result = db_utils.place_order(user)
     return HttpResponse(result)
 
-@get
+@post
 @is_user
 def shopping_history(request):
     user = key_to_user(json_from_request(request))

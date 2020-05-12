@@ -228,6 +228,7 @@ def shopping_history(user):
         return Error422('No shopping history available')
         
     shopping_carts = [ShoppingCartSerializer(cart).data for cart in ShoppingCart.objects.filter(shoppingHistory=shopping_history)]
+    print(shopping_carts)
     return OK200(json.dumps({'carts': shopping_carts}))
 
 def remove_from_cart(params, user):

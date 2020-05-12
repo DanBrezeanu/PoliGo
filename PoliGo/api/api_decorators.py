@@ -21,7 +21,7 @@ def is_staff(func):
         except:
             return HttpResponse(Error403('Unauthorized'))
 
-        # Acces Denied
+        # Acces Denied            
         if profile is None or not profile.user.is_staff:
             return HttpResponse(Error403('Unauthorized'))
 
@@ -37,6 +37,8 @@ def is_user(func):
            profile = key_to_user(json_from_request(args[0]))
         except:
             return HttpResponse(Error401('No such user'))
+
+        print(json_from_request(args[0]))
 
         # No user with such key
         if profile is None:

@@ -75,6 +75,8 @@ public class CheckoutActivity extends Activity implements AdapterView.OnItemSele
     public void onPaymentConfirmed(View v) {
         SharedPrefManager.getInstance(this).clearShoppingCart();
 
+        RequestManager2.getInstance().placeOrder(this);
+
         Intent toFinalMessage = new Intent(CheckoutActivity.this, QRCodeActivity.class);
         startActivity(toFinalMessage);
         finish();
