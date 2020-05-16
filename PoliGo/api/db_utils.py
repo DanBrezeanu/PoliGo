@@ -244,7 +244,7 @@ def remove_from_cart(params, user):
         return Error422('Wrong data')
 
     try:
-        product = cart.products.get(SKU=SKU)
+        product = cart.products.get(item__SKU=SKU)
     except Product.DoesNotExist:
         return Error422('No item with provided SKU')
 
@@ -257,6 +257,9 @@ def remove_from_cart(params, user):
     else:
         product.quantity -= quantity
         product.save()
+
+    cart.totalCost -= quantity * product.price
+    cart.save()
 
     return OK200(json.dumps(ShoppingCartSerializer(cart).data))
 

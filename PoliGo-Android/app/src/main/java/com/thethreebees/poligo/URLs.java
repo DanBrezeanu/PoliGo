@@ -7,6 +7,8 @@ public class URLs {
 
     private static final String ROOT_URL = PROTOCOL + "://" + AUTHORITY + "/" + ROOT_PATH + "/";
 
+    public static final String MEDIA_URL = PROTOCOL + "://" + AUTHORITY + "/media/";
+
     public static final String URL_REGISTER = ROOT_URL + "signup/";
     public static final String URL_LOGIN = ROOT_URL + "login/";
     public static final String URL_ADD_TO_CART = ROOT_URL + "addtocart/";

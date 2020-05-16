@@ -24,8 +24,9 @@ def key_to_user(req_json):
         
 
 def json_from_request(request):
-    # try:
-        print(request.body)
+    if request.method == 'POST':
         return json.loads(request.body.decode('utf-8'))
-    # except:
-    #     return None
+    else:
+        params = dict(request.GET)
+        params['api_key'] = params['api_key'][0]
+        return params

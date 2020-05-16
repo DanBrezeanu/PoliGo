@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -44,7 +46,10 @@ public class ProductAdapter extends BaseAdapter {
 
     public void removeProduct(String SKUProduct) {
         cart.removeProduct(SKUProduct);
+
+        cart.getProducts();
         sharedPref.registerShoppingCart(cart);
+
 
         this.notifyDataSetChanged();
     }
@@ -66,6 +71,9 @@ public class ProductAdapter extends BaseAdapter {
         product.image = element.findViewById(R.id.iv_image_element);
         product.quantity = element.findViewById(R.id.et_quantity);
 
+        context.findViewById(R.id.textViewNoProducts).setVisibility((cart.getCount() > 0) ? View.GONE : View.VISIBLE);
+        Glide.with(context).load(URLs.MEDIA_URL + products.get(i).getSKU() + ".png").into(product.image);
+
         final Button remove = element.findViewById(R.id.tv_SKU_element);
         remove.setOnClickListener(
                 view1 -> {
@@ -82,7 +90,12 @@ public class ProductAdapter extends BaseAdapter {
         final ImageButton increment_quantity = element.findViewById(R.id.add_quantity);
         increment_quantity.setOnClickListener(
                 view12 -> {
-                    addProduct(products.get(i), 1);
+//                    addProduct(products.get(i), 1);
+
+                    RequestManager2.getInstance().addToCart(
+                            (ShoppingListActivity)context,
+                            products.get(i).getSKU()
+                    );
                     product.quantity.setText(products.get(i).getQuantity().toString());
 
                     reloadElementsUI();
@@ -95,7 +108,11 @@ public class ProductAdapter extends BaseAdapter {
                 view13 -> {
                     int initial_quant = products.get(i).getQuantity();
 
-                    removeProduct(products.get(i).getSKU());
+                    RequestManager2.getInstance().removeFromCart(
+                            (ShoppingListActivity)context,
+                             products.get(i).getSKU(),
+                            1
+                    );
 
                     if (initial_quant > 1)
                         product.quantity.setText(products.get(i).getQuantity().toString());
@@ -111,7 +128,7 @@ public class ProductAdapter extends BaseAdapter {
         TagProduct tag = (TagProduct) element.getTag();
         tag.name.setText(products.get(i).getName());
         tag.price.setText(products.get(i).getPrice().toString());
-        tag.image.setImageResource(products.get(i).getImageResource());
+        // tag.image.setImageResource(products.get(i).getImageResource());
         tag.quantity.setText(products.get(i).getQuantity().toString());
 
         reloadElementsUI();
@@ -121,6 +138,7 @@ public class ProductAdapter extends BaseAdapter {
 
     @SuppressLint("SetTextI18n")
     void reloadElementsUI() {
+        cart.getProducts();
         totalSumTextView.setText(cart.getTotalSum().toString());
 
         if (cart.getCount() <= 0)

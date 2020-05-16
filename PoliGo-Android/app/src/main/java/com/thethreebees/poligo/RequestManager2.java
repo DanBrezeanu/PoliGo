@@ -161,6 +161,45 @@ public class RequestManager2 {
         activity.progressBar.setVisibility(View.VISIBLE);
     }
 
+    public void removeFromCart(ShoppingListActivity activity, String barcode, Integer quanity) {
+        User user = SharedPrefManager.getInstance(activity).getUser();
+        JsonObject data = new JsonObject();
+
+        data.addProperty("SKU", barcode);
+        data.addProperty("api_key", user.getId());
+        data.addProperty("quantity", quanity);
+
+        request.removeFromCart(data).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                activity.progressBar.setVisibility(View.GONE);
+                JsonObject response_json = response.body();
+
+                if (response_json == null) {
+                    //TODO: fail no connection
+                    return;
+                }
+
+                if (response_json.get("code").getAsInt() == 200) {
+                    activity.productAdapter.removeProduct(barcode);
+                } else {
+                    new AlertDialog.Builder(activity)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setMessage(response_json.get("message").getAsString())
+                        .setNeutralButton("OK", (dialogInterface, i) -> dialogInterface.dismiss())
+                        .show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                activity.progressBar.setVisibility(View.GONE);
+                Toast.makeText(activity.getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        activity.progressBar.setVisibility(View.VISIBLE);
+    }
+
     public void shoppingCart(ShoppingCart cart) {
         User user = SharedPrefManager.getInstance(null).getUser();
         JsonObject params = new JsonObject();
@@ -234,11 +273,7 @@ public class RequestManager2 {
 
     public void shoppingHistory(ShoppingHistoryActivity activity, ShoppingHistory shoppingHistory) {
         User user = SharedPrefManager.getInstance(activity).getUser();
-        JsonObject data = new JsonObject();
-
-        data.addProperty("api_key", user.getId());
-
-        request.shoppingHistory(data).enqueue(new Callback<JsonObject>() {
+        request.shoppingHistory(user.getId()).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 activity.progressBar.setVisibility(View.GONE);

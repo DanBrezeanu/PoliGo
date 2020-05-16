@@ -113,9 +113,10 @@ def place_order(request):
     result = db_utils.place_order(user)
     return HttpResponse(result)
 
-@post
+@get
 @is_user
 def shopping_history(request):
+    print(dict(request.GET))
     user = key_to_user(json_from_request(request))
 
     result = db_utils.shopping_history(user)
