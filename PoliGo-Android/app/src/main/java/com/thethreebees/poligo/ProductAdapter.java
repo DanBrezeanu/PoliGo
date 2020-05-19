@@ -26,7 +26,7 @@ public class ProductAdapter extends BaseAdapter {
     private SharedPrefManager sharedPref;
     private TextView totalSumTextView;
     private Button finishedShopping;
-    private ArrayList<Product> products;
+    public ArrayList<Product> products;
 
     public ProductAdapter (Activity context) {
         this.context = context;
@@ -34,7 +34,8 @@ public class ProductAdapter extends BaseAdapter {
         sharedPref = SharedPrefManager.getInstance(context);
         totalSumTextView = context.findViewById(R.id.total_sum);
         finishedShopping = context.findViewById(R.id.finished_shopping);
-        products = cart.getProducts();
+        products = new ArrayList<>();
+        RequestManager2.getInstance().shoppingCart(cart, this);
     }
 
     public void addProduct(Product product, int quant) {
@@ -46,10 +47,7 @@ public class ProductAdapter extends BaseAdapter {
 
     public void removeProduct(String SKUProduct) {
         cart.removeProduct(SKUProduct);
-
-        cart.getProducts();
         sharedPref.registerShoppingCart(cart);
-
 
         this.notifyDataSetChanged();
     }
@@ -79,11 +77,20 @@ public class ProductAdapter extends BaseAdapter {
                 view1 -> {
                     int totalQuantity = Integer.parseInt(product.quantity.getText().toString());
 
+                    RequestManager2.getInstance().removeFromCart(
+                            (ShoppingListActivity)context,
+                            products.get(i).getSKU(),
+                            totalQuantity,
+                            this
+                    );
+
+                    RequestManager2.getInstance().shoppingCart(cart, this);
+
                     for (int j = 0; j < totalQuantity; ++j)
                         removeProduct(products.get(i).getSKU());
 
-                    reloadElementsUI();
                     ProductAdapter.this.notifyDataSetChanged();
+                    reloadElementsUI();
                 }
         );
 
@@ -94,12 +101,14 @@ public class ProductAdapter extends BaseAdapter {
 
                     RequestManager2.getInstance().addToCart(
                             (ShoppingListActivity)context,
-                            products.get(i).getSKU()
+                            products.get(i).getSKU(),
+                            this
                     );
                     product.quantity.setText(products.get(i).getQuantity().toString());
 
-                    reloadElementsUI();
+                    RequestManager2.getInstance().shoppingCart(cart, this);
                     ProductAdapter.this.notifyDataSetChanged();
+                    reloadElementsUI();
                 }
         );
 
@@ -111,12 +120,14 @@ public class ProductAdapter extends BaseAdapter {
                     RequestManager2.getInstance().removeFromCart(
                             (ShoppingListActivity)context,
                              products.get(i).getSKU(),
-                            1
+                            1,
+                            this
                     );
 
                     if (initial_quant > 1)
                         product.quantity.setText(products.get(i).getQuantity().toString());
 
+                    RequestManager2.getInstance().shoppingCart(cart, this);
                     reloadElementsUI();
                     ProductAdapter.this.notifyDataSetChanged();
                 }

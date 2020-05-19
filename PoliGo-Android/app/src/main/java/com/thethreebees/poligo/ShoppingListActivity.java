@@ -44,7 +44,6 @@ public class ShoppingListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
-
         context = this;
         sharedPref = SharedPrefManager.getInstance(this);
         user = sharedPref.getUser();
@@ -81,7 +80,8 @@ public class ShoppingListActivity extends Activity {
         if (requestCode == LAUNCH_BARCODE_SCANNING && resultCode == Activity.RESULT_OK) {
             result = data.getStringExtra("result");
 
-            RequestManager2.getInstance().addToCart(this, result);
+            RequestManager2.getInstance().addToCart(this, result, productAdapter);
+            RequestManager2.getInstance().shoppingCart(cart, productAdapter);
         }
     }
 

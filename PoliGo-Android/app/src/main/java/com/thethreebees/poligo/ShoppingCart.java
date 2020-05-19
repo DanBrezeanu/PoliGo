@@ -31,12 +31,8 @@ public class ShoppingCart {
     }
 
     public ArrayList<Product> getProducts() {
-        RequestManager2.getInstance().shoppingCart(this);
+        RequestManager2.getInstance().shoppingCart(this, null);
 
-        totalSum = 0.0;
-        for (int i = 0; i < products.size(); ++i) {
-            totalSum += products.get(i).getPrice() * products.get(i).getQuantity();
-        }
 
         return products;
     }

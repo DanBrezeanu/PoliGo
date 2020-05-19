@@ -112,7 +112,7 @@ public class RequestManager2 {
         context.progressBar.setVisibility(View.VISIBLE);
     }
 
-    public void addToCart(ShoppingListActivity activity, String barcode) {
+    public void addToCart(ShoppingListActivity activity, String barcode, ProductAdapter productAdapter) {
         User user = SharedPrefManager.getInstance(activity).getUser();
         JsonObject data = new JsonObject();
 
@@ -143,6 +143,12 @@ public class RequestManager2 {
 
                     activity.productAdapter.addProduct(new_prod, 1);
 
+
+                    if (productAdapter != null) {
+                        productAdapter.notifyDataSetChanged();
+                        productAdapter.reloadElementsUI();
+                    }
+
                 } else {
                     AlertDialog alertDialog = new AlertDialog.Builder(activity)
                             .setIcon(android.R.drawable.ic_dialog_alert)
@@ -161,7 +167,7 @@ public class RequestManager2 {
         activity.progressBar.setVisibility(View.VISIBLE);
     }
 
-    public void removeFromCart(ShoppingListActivity activity, String barcode, Integer quanity) {
+    public void removeFromCart(ShoppingListActivity activity, String barcode, Integer quanity, ProductAdapter productAdapter) {
         User user = SharedPrefManager.getInstance(activity).getUser();
         JsonObject data = new JsonObject();
 
@@ -182,6 +188,12 @@ public class RequestManager2 {
 
                 if (response_json.get("code").getAsInt() == 200) {
                     activity.productAdapter.removeProduct(barcode);
+
+
+                    if (productAdapter != null) {
+                        productAdapter.notifyDataSetChanged();
+                        productAdapter.reloadElementsUI();
+                    }
                 } else {
                     new AlertDialog.Builder(activity)
                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -200,15 +212,13 @@ public class RequestManager2 {
         activity.progressBar.setVisibility(View.VISIBLE);
     }
 
-    public void shoppingCart(ShoppingCart cart) {
+    public void shoppingCart(ShoppingCart cart, ProductAdapter productAdapter) {
         User user = SharedPrefManager.getInstance(null).getUser();
 
         request.shoppingCart(user.getId()).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 JsonObject apiResponse = response.body();
-
-                Log.d("here", "1");
 
                 if (apiResponse.get("code").getAsInt() == 200) {
                     cart.setDate(apiResponse.get("date").getAsString());
@@ -232,7 +242,21 @@ public class RequestManager2 {
                         products.add(new_prod);
                     }
 
+                    if (productAdapter != null) {
+                        productAdapter.products = products;
+                        System.out.print(productAdapter.products);
+                    }
+
                     cart.setProducts(products);
+                    cart.setTotalSum(0.0);
+                    for (int i = 0; i < products.size(); ++i) {
+                        cart.setTotalSum(cart.getTotalSum() + products.get(i).getPrice() * products.get(i).getQuantity());
+                    }
+
+                    if (productAdapter != null) {
+                        productAdapter.notifyDataSetChanged();
+                        productAdapter.reloadElementsUI();
+                    }
                 }
             }
 

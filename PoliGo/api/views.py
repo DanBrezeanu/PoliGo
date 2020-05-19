@@ -84,8 +84,8 @@ def add_card(request):
     return HttpResponse(result)
 
 
-# @get
-# @is_user
+@get
+@is_user
 def shopping_cart(request):
     print(request.body)
     req_json = json_from_request(request)
@@ -94,6 +94,7 @@ def shopping_cart(request):
     user = key_to_user(req_json)
 
     cart = db_utils.shopping_cart(user)
+    print(cart)
     return HttpResponse(cart)
 
 @post
