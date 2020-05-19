@@ -7,137 +7,145 @@
     android:background="#FFFFFF"
     tools:context=".CheckoutActivity">
 
-
-    <TextView
-        android:id="@+id/title"
+    <FrameLayout
+        android:id="@+id/frameTop"
         android:layout_width="match_parent"
-        android:layout_height="122dp"
-        android:layout_marginBottom="688dp"
-        android:background="@drawable/full_screen_button"
-        android:fontFamily="sans-serif-condensed"
-        android:gravity="center"
-        android:text="Checkout"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/theOrange"
-        android:textSize="40dp"
+        android:layout_height="650dp"
+        android:background="@color/theWhite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0">
 
-    <LinearLayout
-        android:id="@+id/total_views_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="520dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+
+        <TextView
+            android:id="@+id/backg"
+            android:layout_width="match_parent"
+            android:layout_height="335dp"
+            android:layout_marginBottom="688dp"
+            android:background="@color/theOrange"
+            android:fontFamily="@font/roboto"
+            android:gravity="top|center_horizontal"
+            android:paddingTop="75dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/theWhite"
+            android:textCursorDrawable="@drawable/color_cursor" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_button"
+            android:layout_marginTop="100dp"
+            android:layout_marginHorizontal="20dp">
+
+            <TextView
+                android:id="@+id/titleCheckout"
+                android:layout_width="match_parent"
+                android:layout_height="122dp"
+                android:background="@color/theWhite"
+                android:fontFamily="@font/roboto"
+                android:gravity="center"
+                android:text="Checkout"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginVertical="10dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@color/theOrange"
+                android:textSize="40dp" />
+
+
+            <TextView
+                android:id="@+id/start_shopping"
+                android:layout_width="match_parent"
+                android:layout_height="63dp"
+                android:gravity="center"
+                android:fontFamily="@font/roboto"
+                android:text="Total to pay "
+                android:textAlignment="center"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/total_sum"
+                android:background="@drawable/rounded_button"
+                android:layout_marginHorizontal="70dp"
+                android:layout_width="match_parent"
+                android:layout_height="63dp"
+                android:gravity="center"
+                android:fontFamily="@font/roboto"
+                android:text="50 RON"
+                android:textSize="25dp"
+                android:textStyle="bold" />
+
+
+            <TextView
+                android:id="@+id/payment_card"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="100dp"
+                android:text="Payment option:"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:background="@drawable/full_screen_button_all_margins"
+                android:id="@+id/dropdown_cards"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginHorizontal="30dp"
+                android:spinnerMode="dropdown" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/confirm_button"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_marginHorizontal="30dp"
+        android:background="@drawable/checkout_item_button"
+        android:onClick="onPaymentConfirmed"
+        android:text="Confirm payment"
+        android:fontFamily="@font/roboto"
+        android:textColor="@color/theWhite"
+        android:paddingLeft="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        android:layout_marginTop="180dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title">
+        app:layout_constraintTop_toBottomOf="@+id/frameTop" />
 
-        <TextView
-            android:id="@+id/start_shopping"
-            android:layout_width="match_parent"
-            android:layout_height="63dp"
-            android:gravity="center"
-            android:textSize="20sp"
-            android:textAlignment="center"
-            android:text="Total to pay " />
 
-        <TextView
-            android:id="@+id/total_sum"
-            android:layout_width="match_parent"
-            android:layout_height="63dp"
-            android:textSize="20dp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:text="50 RON" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/back_to_cart"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/total_views_layout"
-        android:layout_marginTop="100dp"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="20dp">
-
-        <TextView
-            android:id="@+id/payment_card"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="Payment option:"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:textSize="20dp"
-            android:textStyle="bold" />
-
-
-        <Spinner
-            android:id="@+id/dropdown_cards"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:spinnerMode="dropdown"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
-
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="448dp"
-
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:background="@color/theOrange"
+        android:drawableStart="@drawable/ic_arrow_back_black_24dp"
+        android:paddingLeft="15dp"
+        android:onClick="onBackToCart"
+        android:stateListAnimator="@null"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/back_to_cart"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:onClick="onBackToCart"
-            android:layout_height="match_parent"
-            android:background="@drawable/full_screen_button_all_margins"
-            android:text="Back to shopping list" />
-
-        <Button
-            android:id="@+id/confirm_button"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:onClick="onPaymentConfirmed"
-            android:layout_height="match_parent"
-            android:background="@drawable/full_screen_button"
-            android:text="Confirm payment" />
-
-    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:visibility="gone"
-        android:indeterminateDrawable="@drawable/progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:indeterminateDrawable="@drawable/progress"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameTop"
         app:layout_constraintVertical_bias="0.456" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

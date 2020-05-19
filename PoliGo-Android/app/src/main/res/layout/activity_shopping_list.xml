@@ -64,7 +64,7 @@
             android:layout_marginBottom="5dp"
             android:textColor="@color/theWhite"
             android:fontFamily="@font/roboto"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

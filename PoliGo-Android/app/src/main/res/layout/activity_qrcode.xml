@@ -7,44 +7,78 @@
     android:background="@color/theWhite"
     tools:context=".QRCodeActivity">
 
+    <FrameLayout
+        android:id="@+id/frameTop"
+        android:layout_width="match_parent"
+        android:background="@color/theWhite"
+        android:layout_height="275dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_marginBottom="688dp"
+        android:fontFamily="@font/roboto"
+        android:gravity="top|center_horizontal"
+        android:paddingTop="40dp"
+        android:text="PoliGo"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/theWhite"
+        android:background="@color/theOrange"
+        android:textCursorDrawable="@drawable/color_cursor"
+        android:textSize="40dp"
+        />
+
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginHorizontal="20dp"
         android:gravity="center"
+        android:background="@drawable/rounded_button"
         android:text="Thank you for\nshopping at PoliGo!"
         android:textColor="@color/theOrange"
         android:textSize="30dp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent" />
 
+    </FrameLayout>
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="1:1"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonDone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:layout_constraintVertical_bias="0.212" />
+        app:layout_constraintDimensionRatio="1:1"
+
+        app:layout_constraintTop_toBottomOf="@+id/frameTop"
+        app:layout_constraintVertical_bias="0.212"
+        tools:layout_editor_absoluteX="0dp" />
 
     <Button
         android:id="@+id/buttonDone"
-        android:layout_width="210dp"
-        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="140dp"
-        android:background="@drawable/rounded_button"
+        android:background="@drawable/rounded_button_reversed"
+        android:textColor="@color/theWhite"
+        android:fontFamily="@font/roboto"
+        android:layout_marginHorizontal="60dp"
         android:text="Done"
         android:onClick="onShoppingDone"
+        android:layout_marginTop="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintTop_toBottomOf="@id/imageView"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
