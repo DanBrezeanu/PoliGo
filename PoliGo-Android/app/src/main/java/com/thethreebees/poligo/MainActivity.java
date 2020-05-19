@@ -44,58 +44,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             finish();
         }
 
-        drawerLayout = (DrawerLayout)findViewById(R.id.activity_main);
-        navigationView = (NavigationView) findViewById(R.id.nv);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
-
-        drawerLayout.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
-        mDrawerToggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.theWhite));
-        drawerLayout.addDrawerListener(mDrawerToggle);
-
-
-        mDrawerToggle.setDrawerIndicatorEnabled(true);
-        mDrawerToggle.syncState();
-
-
-        navigationView = (NavigationView)findViewById(R.id.nv);
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            switch(id)
-            {
-            case R.id.account:
-                Toast.makeText(MainActivity.this, "My Account",Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.history:
-                Toast.makeText(MainActivity.this, "Settings",Toast.LENGTH_SHORT).show();
-                Intent toShoppingHistory = new Intent(MainActivity.this, ShoppingHistoryActivity.class);
-                startActivity(toShoppingHistory);
-                finish();
-                break;
-            case R.id.mycart:
-                Intent toCart = new Intent(MainActivity.this, ShoppingListActivity.class);
-                startActivity(toCart);
-                finish();
-                break;
-            default:
-                return true;
-            }
-
-            return true;
-        });
-
-        gestureDetector = new GestureDetector(this, new SwipeDrawerDetection());
-        gestureListener = (v, event) -> gestureDetector.onTouchEvent(event);
-
-        ConstraintLayout background = findViewById(R.id.background_layout);
-        background.setOnClickListener(MainActivity.this);
-        background.setOnTouchListener(gestureListener);
-
+        btnLogout = findViewById(R.id.logout);
+        new NavDrawer().setNavigationDrawer(this, R.color.theWhite);
     }
 
     @Override
@@ -130,39 +80,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         finish();
     }
 
+    public void onSettings(View v) {
+        startActivity(new Intent(this, SettingsActivity.class));
+    }
+
     @Override
     public void onBackPressed() {
         finish();
-    }
-
-
-    class SwipeDrawerDetection extends GestureDetector.SimpleOnGestureListener {
-        private static final int SWIPE_MIN_DISTANCE = 120;
-        private static final int SWIPE_MAX_OFF_PATH = 250;
-        private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            try {
-                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                    return false;
-                // right to left swipe
-                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    drawerLayout.closeDrawer(Gravity.LEFT);
-
-                } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    drawerLayout.openDrawer(Gravity.LEFT);
-                }
-            } catch (Exception e) {
-                // nothing
-            }
-            return false;
-        }
-
-        @Override
-        public boolean onDown(MotionEvent e) {
-            return true;
-        }
     }
 
 }

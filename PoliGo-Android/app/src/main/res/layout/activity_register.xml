@@ -7,102 +7,149 @@
     tools:context=".RegisterActivity"
     android:background="@color/theWhite">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+
+    <FrameLayout
+        android:id="@+id/frameTop"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerVertical="true"
-        android:orientation="vertical"
-        android:padding="10dp"
+        android:background="@color/theWhite"
+        android:layout_height="550dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
 
         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:gravity="center"
-            android:text="Register"
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="335dp"
+            android:layout_marginBottom="688dp"
+            android:fontFamily="@font/roboto"
+            android:gravity="top|center_horizontal"
+            android:paddingTop="75dp"
+            android:text="PoliGo"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@color/theOrange"
-            android:textSize="40dp" />
+            android:textColor="@color/theWhite"
+            android:background="@color/theOrange"
+            android:textSize="40dp"
+            />
 
-        <EditText
-            android:id="@+id/editTextUsername"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/theOrange"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:hint="Username"
-            android:text="Test"
-            android:inputType="text" />
-
-        <EditText
-            android:id="@+id/editTextEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/theOrange"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:hint="Email"
-            android:text="test@test.com"
-            android:inputType="textEmailAddress" />
-
-        <EditText
-            android:id="@+id/editTextPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/theOrange"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:fontFamily="sans-serif"
-            android:text="test"
-            android:hint="Password"
-            android:inputType="textPassword" />
-
-        <EditText
-            android:id="@+id/editTextConfPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/theOrange"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:fontFamily="sans-serif"
-            android:text="test"
-            android:hint="Confirm password"
-            android:inputType="textPassword" />
-
-        <Button
-            android:id="@+id/buttonRegister"
+            android:orientation="vertical"
+            android:layout_marginTop="170dp"
+            android:elevation="2dp"
             android:background="@drawable/rounded_button"
-            android:layout_marginTop="200dp"
-            android:layout_marginBottom="8dp"
-            android:layout_width="210dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:text="Proceed to payment   details" />
+            android:layout_marginHorizontal="20dp"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textViewLogin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="8dp"
-            android:text="Already registered? "
-            android:textAlignment="center"/>
-    </LinearLayout>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="30dp"
+                android:gravity="center"
+                android:text="Register"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@color/theOrange"
+                android:textSize="30dp" />
+
+            <EditText
+                android:id="@+id/editTextUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/theOrange"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:hint="Username"
+                android:inputType="text"
+                android:drawableStart="@drawable/ic_account_circle_gray_24dp"
+                android:drawablePadding="10dp"
+                />
+
+            <EditText
+                android:id="@+id/editTextEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/theOrange"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:hint="Email"
+                android:drawableStart="@drawable/ic_email_black_24dp"
+                android:drawablePadding="10dp"
+                android:inputType="textEmailAddress" />
+
+            <EditText
+                android:id="@+id/editTextPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/theOrange"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif"
+                android:hint="Password"
+                android:drawableStart="@drawable/ic_vpn_key_black_24dp"
+                android:drawablePadding="10dp"
+                android:inputType="textPassword" />
+
+            <EditText
+                android:id="@+id/editTextConfPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/theOrange"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif"
+                android:hint="Confirm password"
+                android:drawableStart="@drawable/ic_vpn_key_black_24dp"
+                android:drawablePadding="10dp"
+                android:inputType="textPassword" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+    <Button
+        android:id="@+id/buttonRegister"
+        android:layout_width="210dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/rounded_button"
+        android:text="Proceed to payment   details"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameTop" />
+
+    <TextView
+        android:id="@+id/textViewLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Already registered? "
+        android:textAlignment="center"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonRegister"
+        app:layout_constraintVertical_bias="0.405"
+    />
 
     <ProgressBar
         android:id="@+id/progressBar"

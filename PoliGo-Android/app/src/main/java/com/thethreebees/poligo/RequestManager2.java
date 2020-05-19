@@ -200,7 +200,7 @@ public class RequestManager2 {
         activity.progressBar.setVisibility(View.VISIBLE);
     }
 
-    public void shoppingCart(ShoppingCart cart, ProductAdapter productAdapter) {
+    public void shoppingCart(ShoppingCart cart) {
         User user = SharedPrefManager.getInstance(null).getUser();
 
         request.shoppingCart(user.getId()).enqueue(new Callback<JsonObject>() {
@@ -230,18 +230,9 @@ public class RequestManager2 {
                                 prod.get("quantity").getAsInt());
 
                         products.add(new_prod);
-
-                        if (productAdapter != null) {
-                            productAdapter.addProduct(new_prod, new_prod.getQuantity());
-                        }
                     }
 
                     cart.setProducts(products);
-
-                    if (productAdapter != null)
-                    productAdapter.notifyDataSetChanged();
-
-
                 }
             }
 
