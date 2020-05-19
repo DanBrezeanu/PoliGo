@@ -200,43 +200,56 @@ public class RequestManager2 {
         activity.progressBar.setVisibility(View.VISIBLE);
     }
 
-    public void shoppingCart(ShoppingCart cart) {
+    public void shoppingCart(ShoppingCart cart, ProductAdapter productAdapter) {
         User user = SharedPrefManager.getInstance(null).getUser();
-        JsonObject params = new JsonObject();
-        params.addProperty("api_key", user.getId());
 
-        Call<JsonObject> shoppingCartRequest = request.shoppingCart(params);
+        request.shoppingCart(user.getId()).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                JsonObject apiResponse = response.body();
 
-        try
-        {
-            Response<JsonObject> response = shoppingCartRequest.execute();
-            JsonObject apiResponse = response.body();
+                Log.d("here", "1");
 
-            if (apiResponse.get("code").getAsInt() == 200) {
-                cart.setDate(apiResponse.get("date").getAsString());
-                cart.setTotalSum(apiResponse.get("totalCost").getAsDouble());
+                if (apiResponse.get("code").getAsInt() == 200) {
+                    cart.setDate(apiResponse.get("date").getAsString());
+                    cart.setTotalSum(apiResponse.get("totalCost").getAsDouble());
 
-                ArrayList<Product> products = new ArrayList<>();
-                JsonArray prods = apiResponse.get("products").getAsJsonArray();
-                for (JsonElement prod_element : prods) {
-                    JsonObject prod = prod_element.getAsJsonObject();
+                    ArrayList<Product> products = new ArrayList<>();
+                    JsonArray prods = apiResponse.get("products").getAsJsonArray();
 
-                    products.add(new Product(
-                            prod.get("SKU").getAsString(),
-                            prod.get("name").getAsString(),
-                            prod.get("price").getAsDouble(),
-                            image,
-                            prod.get("quantity").getAsInt()
-                    ));
+                    System.out.println(prods.size());
+
+                    for (JsonElement prod_element : prods) {
+                        JsonObject prod = prod_element.getAsJsonObject();
+
+                        Product new_prod = new Product(
+                                prod.get("SKU").getAsString(),
+                                prod.get("name").getAsString(),
+                                prod.get("price").getAsDouble(),
+                                image,
+                                prod.get("quantity").getAsInt());
+
+                        products.add(new_prod);
+
+                        if (productAdapter != null) {
+                            productAdapter.addProduct(new_prod, new_prod.getQuantity());
+                        }
+                    }
+
+                    cart.setProducts(products);
+
+                    if (productAdapter != null)
+                    productAdapter.notifyDataSetChanged();
+
+
                 }
-
-                cart.setProducts(products);
             }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+
+            }
+        });
     }
 
     public void placeOrder(CheckoutActivity activity) {

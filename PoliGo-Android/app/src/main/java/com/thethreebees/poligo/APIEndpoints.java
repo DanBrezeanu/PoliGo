@@ -18,8 +18,8 @@ public interface APIEndpoints {
     @POST("addtocart/")
     Call<JsonObject> addToCart(@Body JsonObject data);
 
-    @POST("shoppingcart/")
-    Call<JsonObject> shoppingCart(@Body JsonObject data);
+    @GET("shoppingcart/")
+    Call<JsonObject> shoppingCart(@Query("api_key") String api_key);
 
     @POST("placeorder/")
     Call<JsonObject> placeOrder(@Body JsonObject data);

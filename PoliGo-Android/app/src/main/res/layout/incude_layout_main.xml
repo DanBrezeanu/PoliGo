@@ -8,82 +8,101 @@
     android:id="@+id/background_layout"
     android:background="#FFFFFF">
 
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <FrameLayout
+        android:id="@+id/frameTop"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:theme="@style/ToolbarTheme"
-        app:titleTextColor="#FFFFFF"
-        app:layout_collapseMode="pin"
-        tools:targetApi="lollipop" />
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="122dp"
-        android:layout_marginBottom="688dp"
-        android:fontFamily="sans-serif-condensed"
-        android:gravity="center"
-        android:text="PoliGo"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/theOrange"
-        android:textSize="40dp"
+        android:layout_height="420dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        >
 
-    <Button
-        android:id="@+id/start_shopping"
-        android:layout_width="206dp"
-        android:layout_height="63dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginBottom="520dp"
-        android:background="@drawable/rounded_button"
-        android:onClick="startShoppingClick"
-        android:text="Start shopping"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/theOrange"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:theme="@style/ToolbarTheme"
+            app:titleTextColor="@color/theOrange"
+            app:layout_collapseMode="pin"
+            tools:targetApi="lollipop" />
 
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:layout_marginBottom="688dp"
+            android:fontFamily="@font/roboto"
+            android:gravity="top|center_horizontal"
+            android:paddingTop="30dp"
+            android:text="PoliGo"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/theWhite"
+            android:background="@color/theOrange"
+            android:layout_marginTop="45dp"
+            android:textSize="40dp"
+        />
+
+
+        <Button
+            android:id="@+id/start_shopping"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:background="@drawable/rounded_button"
+            android:textColor="@color/theOrange"
+            android:textSize="25sp"
+            android:drawableBottom="@drawable/ic_shopping_cart_black_24dp"
+            android:onClick="startShoppingClick"
+            android:paddingBottom="20dp"
+            android:layout_marginTop="170dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:textAllCaps="false"
+            android:text="Start shopping"
+            android:fontFamily="sans-serif-black"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:layout_constraintEnd_toEndOf="@id/title" />
+    </FrameLayout>
 
     <Button
         android:id="@+id/settings"
-        android:layout_width="206dp"
-        android:layout_height="63dp"
-        android:layout_marginTop="212dp"
-        android:layout_marginBottom="276dp"
-        android:background="@drawable/rounded_button"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/rounded_button_reversed"
         android:text="Settings"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@color/theWhite"
+        android:fontFamily="@font/roboto"
+        android:textSize="17sp"
+        android:layout_marginTop="70dp"
+        android:layout_marginHorizontal="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
+        app:layout_constraintTop_toBottomOf="@+id/frameTop" />
 
     <Button
         android:id="@+id/exit"
-        android:layout_width="206dp"
-        android:layout_height="63dp"
-        android:layout_marginTop="448dp"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="220dp"
         android:layout_marginBottom="100dp"
+        android:layout_marginHorizontal="10dp"
         android:background="@drawable/rounded_button"
+        android:textColor="@color/theOrange"
+        android:fontFamily="@font/roboto"
+        android:textSize="17sp"
         android:text="Exit"
         android:onClick="exitApp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
+        app:layout_constraintTop_toBottomOf="@+id/frameTop" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar(toolbar);
 
         ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
-        mDrawerToggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.theOrange));
+        mDrawerToggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.theWhite));
         drawerLayout.addDrawerListener(mDrawerToggle);
 
 
